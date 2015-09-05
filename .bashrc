@@ -1,4 +1,10 @@
+# SW_HOME is not exported, since no child process should need to access it.
 SW_HOME='/home/mkw/sw/shearwater'
+
+export VISUAL=subl
+export EDITOR="$VISUAL"
+export GIT_EDITOR=vim
+
 alias cs='cd $SW_HOME'
 alias ce='cd $SW_HOME/ember'
 alias cr='cd $SW_HOME/rails'
@@ -18,7 +24,9 @@ alias g='git'
 alias gs='git status'
 alias ga='git add'
 alias gd='git diff'
+alias gdc='git diff --cached'
 alias gc='git checkout'
+alias gcm='git commit'
 alias gb='git branch'
 alias gsl='git stash list'
 alias gss='git stash save'
@@ -62,6 +70,11 @@ function rr {
 function rc {
   cd $SW_HOME/rails
   rails console
+}
+
+function et {
+  pushd $SW_HOME/ember
+  ember test
 }
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
@@ -183,6 +196,10 @@ fi
 
 #### -- END DEFAULT SECTION -- ####
 
+alias br='brightness'
+function brightness {
+    sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
+}
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
