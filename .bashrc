@@ -5,6 +5,8 @@ export VISUAL=subl
 export EDITOR="$VISUAL"
 export GIT_EDITOR=vim
 
+alias csubl='c ~/.config/sublime-text-3/Packages/User/'
+
 alias cs='cd $SW_HOME'
 alias ce='cd $SW_HOME/ember'
 alias cr='cd $SW_HOME/rails'
@@ -30,9 +32,10 @@ alias gcm='git commit'
 alias gb='git branch'
 alias gsl='git stash list'
 alias gss='git stash save'
-alias gsd='git stash drop'
 alias gsa='git stash apply'
 alias gpr='git pull --rebase'
+alias gpf='git pull --ff-only'
+alias gmf='git merge --ff-only'
 alias gba='git branch -a'
 alias gl='git log'
 
@@ -75,7 +78,10 @@ function rc {
 function et {
   pushd $SW_HOME/ember
   ember test
+  popd
 }
+
+alias hrrc='heroku run rails console --app shearwater'
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
 
