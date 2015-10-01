@@ -38,6 +38,7 @@ alias gpf='git pull --ff-only'
 alias gmf='git merge --ff-only'
 alias gba='git branch -a'
 alias gl='git log'
+alias gf='git fetch'
 
 alias op='git ls-files -m'
 alias sop='subl $(git ls-files -m)'
@@ -53,10 +54,16 @@ alias c3='cd ../../..'
 alias c4='cd ../../../..'
 alias c5='cd ../../../..'
 alias c6='cd ../../../../..'
+alias gcs='google-chrome-stable'
 
 function c {
     cd $1
     ls
+}
+
+# TODO: this doesn't colorize results correctly.
+function gpfr {
+  gp $1 $(fr)
 }
 
 function rbc {
@@ -80,6 +87,21 @@ function et {
   ember test
   popd
 }
+
+function rt {
+  pushd $SW_HOME/rails
+  rspec
+  popd
+}
+
+function catchmail {
+  gem install mailcatcher
+  mailcatcher
+  google-chrome-stable http://127.0.0.1:1080
+}
+
+# To delete local branches that have been merged, run:
+# git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
 
 alias hrrc='heroku run rails console --app shearwater'
 
