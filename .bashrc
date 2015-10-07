@@ -9,6 +9,7 @@ alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 
 alias cs='cd $SW_HOME'
 alias ce='cd $SW_HOME/ember'
+alias cea='cd $SW_HOME/ember/app'
 alias cr='cd $SW_HOME/rails'
 
 alias fn='find -type f -name'
@@ -29,10 +30,12 @@ alias gd='git diff'
 alias gdc='git diff --cached'
 alias gc='git checkout'
 alias gcm='git commit'
+alias gcam='git commit -am'
 alias gb='git branch'
 alias gsl='git stash list'
 alias gss='git stash save'
 alias gsa='git stash apply'
+alias gssp='git stash show -p'
 alias gpr='git pull --rebase'
 alias gpf='git pull --ff-only'
 alias gmf='git merge --ff-only'
@@ -61,9 +64,12 @@ function c {
     ls
 }
 
-# TODO: this doesn't colorize results correctly.
 function gpfr {
-  gp $1 $(fr)
+  gp --color "$@" $(fr)
+}
+
+function gpnifr {
+  gpni --color "$@" $(fr)
 }
 
 function rbc {
