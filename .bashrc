@@ -35,7 +35,6 @@ alias gb='git branch'
 alias gsl='git stash list'
 alias gss='git stash save'
 alias gsa='git stash apply'
-alias gssp='git stash show -p'
 alias gpr='git pull --rebase'
 alias gpf='git pull --ff-only'
 alias gmf='git merge --ff-only'
@@ -104,6 +103,10 @@ function catchmail {
   gem install mailcatcher
   mailcatcher
   google-chrome-stable http://127.0.0.1:1080
+}
+
+function gssp {
+  eval "git stash show -p stash@{$1}"
 }
 
 # To delete local branches that have been merged, run:
