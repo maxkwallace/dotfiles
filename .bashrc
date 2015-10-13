@@ -6,6 +6,7 @@ export EDITOR="$VISUAL"
 export GIT_EDITOR=vim
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
+alias cb='cd ~/repos/dotfiles/'
 
 alias cs='cd $SW_HOME'
 alias ce='cd $SW_HOME/ember'
@@ -13,12 +14,12 @@ alias cea='cd $SW_HOME/ember/app'
 alias cr='cd $SW_HOME/rails'
 
 alias fn='find -type f -name'
-alias fr='f | gpv "Gemfile\.lock" | gpv "/coverage/" | gpv "/public/" | gpv "/log/" | gpv "/tmp/" | gpv "/vendor/" | gpv "/dist/" | gpv "/node_modules/" | gpv "/bower_components/"'
+alias fr='f | gpv "Gemfile\.lock" | gpv "/coverage/" | gpv "/public/" | gpv "/log/" | gpv "/tmp/" | gpv "/vendor/" | gpv "/dist/" | gpv "/node_modules/" | gpv "/bower_components/" | gpv "./.git/"'
 alias f='find -type f'
-alias gp='grep -i'
-alias gpni='grep'
-alias gpvni='grep -v'
-alias gpv='grep -v -i'
+alias gp='grep -E -i'
+alias gpni='grep -E'
+alias gpvni='grep -E -v'
+alias gpv='grep -E -v -i'
 alias sagi='sudo apt-get install'
 alias sag='sudo apt-get'
 alias cl='clear'
@@ -94,6 +95,12 @@ function et {
 }
 
 function rt {
+  pushd $SW_HOME/rails
+  RAILS_ENV=test rake test
+  popd
+}
+
+function rs {
   pushd $SW_HOME/rails
   rspec
   popd
