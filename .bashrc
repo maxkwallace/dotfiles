@@ -42,9 +42,9 @@ alias gmf='git merge --ff-only'
 alias gba='git branch -a'
 alias gl='git log'
 alias gf='git fetch'
-
-alias op='git ls-files -m'
-alias sop='subl $(git ls-files -m)'
+alias gph='git push'
+alias grc='git rebase --continue'
+alias gra='git rebase --abort'
 
 alias s='subl'
 
@@ -58,6 +58,12 @@ alias c4='cd ../../../..'
 alias c5='cd ../../../..'
 alias c6='cd ../../../../..'
 alias gcs='google-chrome-stable'
+
+function rrfp {
+  pushd $SW_HOME
+  rake restore_from_production
+  popd
+}
 
 function c {
     cd $1
@@ -114,6 +120,18 @@ function catchmail {
 
 function gssp {
   eval "git stash show -p stash@{$1}"
+}
+
+function gcount {
+  git log $1..$2 --pretty=oneline | wc -l
+}
+
+function op {
+  git status --short | awk '$1 ~ /^M|A|U/ {print $2}'
+}
+
+function sop {
+  subl $(op)
 }
 
 # To delete local branches that have been merged, run:
