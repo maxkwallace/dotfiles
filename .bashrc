@@ -24,12 +24,27 @@ alias sagi='sudo apt-get install'
 alias sag='sudo apt-get'
 alias cl='clear'
 
+source /usr/share/bash-completion/completions/git
+
 alias g='git'
-alias gs='git status'
-alias ga='git add'
-alias gd='git diff'
-alias gdc='git diff --cached'
+__git_complete g __git_main
+
 alias gc='git checkout'
+__git_complete gc _git_checkout
+
+alias gmf='git merge --ff-only'
+__git_complete gmf _git_merge
+
+alias gd='git diff'
+__git_complete gd _git_diff
+
+alias gdc='git diff --cached'
+__git_complete gdc _git_diff
+
+alias ga='git add'
+__git_complete ga _git_add
+
+alias gs='git status'
 alias gcm='git commit'
 alias gcam='git commit -am'
 alias gb='git branch'
@@ -38,13 +53,13 @@ alias gss='git stash save'
 alias gsa='git stash apply'
 alias gpr='git pull --rebase'
 alias gpf='git pull --ff-only'
-alias gmf='git merge --ff-only'
 alias gba='git branch -a'
 alias gl='git log'
 alias gf='git fetch'
 alias gph='git push'
 alias grc='git rebase --continue'
 alias gra='git rebase --abort'
+alias gaa='git add -A'
 
 alias s='subl'
 
@@ -263,7 +278,10 @@ function brightness {
     sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
 }
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+# I changed the heroku directory to be added to the end of the PATH rather than the beginning--
+# this was causing issues with RVM.
 
-### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
+# Added by the Heroku Toolbelt:
+export PATH="$PATH:/usr/local/heroku/bin"
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
