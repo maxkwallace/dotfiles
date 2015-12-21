@@ -5,17 +5,19 @@ export VISUAL=subl
 export EDITOR="$VISUAL"
 export GIT_EDITOR=vim
 
+function join { local IFS="$1"; shift; echo "$*"; }
+
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias cb='cd ~/repos/dotfiles/'
 
+alias ct='cd $SW_HOME/two'
 alias cs='cd $SW_HOME'
 alias ce='cd $SW_HOME/ember'
 alias cea='cd $SW_HOME/ember/app'
 alias cr='cd $SW_HOME/rails'
-
 alias fn='find -type f -name'
-alias fr='f | gpv "Gemfile\.lock" | gpv "/coverage/" | gpv "/public/" | gpv "/log/" | gpv "/tmp/" | gpv "/vendor/" | gpv "/dist/" | gpv "/node_modules/" | gpv "/bower_components/" | gpv "./.git/"'
 alias f='find -type f'
+alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name public -o -name vendor -o -name dist \) -prune -o -type f -print'
 alias gp='grep -E -i'
 alias gpni='grep -E'
 alias gpvni='grep -E -v'
@@ -23,6 +25,7 @@ alias gpv='grep -E -v -i'
 alias sagi='sudo apt-get install'
 alias sag='sudo apt-get'
 alias cl='clear'
+alias spo='sudo poweroff'
 
 source /usr/share/bash-completion/completions/git
 
@@ -44,22 +47,27 @@ __git_complete gdc _git_diff
 alias ga='git add'
 __git_complete ga _git_add
 
+alias gb='git branch'
+__git_complete gb _git_branch
+
 alias gs='git status'
 alias gcm='git commit'
 alias gcam='git commit -am'
-alias gb='git branch'
 alias gsl='git stash list'
 alias gss='git stash save'
 alias gsa='git stash apply'
 alias gpr='git pull --rebase'
-alias gpf='git pull --ff-only'
 alias gba='git branch -a'
 alias gl='git log'
 alias gf='git fetch'
 alias gph='git push'
+alias gpf='git push -f'
 alias grc='git rebase --continue'
 alias gra='git rebase --abort'
+alias grs='git rebase --skip'
 alias gaa='git add -A'
+
+alias gco='git checkout --ours'
 
 alias s='subl'
 
@@ -74,9 +82,15 @@ alias c5='cd ../../../..'
 alias c6='cd ../../../../..'
 alias gcs='google-chrome-stable'
 
-function rrfp {
+function rrfpuc {
   pushd $SW_HOME
   rake restore_from_production
+  popd
+}
+
+function rrfp {
+  pushd $SW_HOME/rails
+  rake restore_from_most_recent_production_backup
   popd
 }
 
@@ -105,8 +119,9 @@ function rr {
 }
 
 function rc {
-  cd $SW_HOME/rails
-  rails console
+  pushd $SW_HOME/rails
+  bin/rails console
+  popd
 }
 
 function et {
@@ -124,6 +139,12 @@ function rt {
 function rs {
   pushd $SW_HOME/rails
   rspec
+  popd
+}
+
+function es {
+  pushd $SW2_HOME
+  ember server
   popd
 }
 
@@ -149,8 +170,15 @@ function sop {
   subl $(op)
 }
 
+function gpsu {
+  git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)
+}
+
 # To delete local branches that have been merged, run:
 # git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+
+# To prune danging remotes:
+# git fetch --prune
 
 alias hrrc='heroku run rails console --app shearwater'
 
@@ -285,3 +313,6 @@ function brightness {
 export PATH="$PATH:/usr/local/heroku/bin"
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+export NVM_DIR="/home/mkw/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
