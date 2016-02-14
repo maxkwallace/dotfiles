@@ -8,6 +8,7 @@ export GIT_EDITOR=vim
 function join { local IFS="$1"; shift; echo "$*"; }
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
+alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/repos/dotfiles/'
 
 alias ct='cd $SW_HOME/two'
@@ -23,9 +24,14 @@ alias gpni='grep -E'
 alias gpvni='grep -E -v'
 alias gpv='grep -E -v -i'
 alias sagi='sudo apt-get install'
+alias sagu='sudo apt-get update'
 alias sag='sudo apt-get'
 alias cl='clear'
 alias spo='sudo poweroff'
+alias umf='git diff --name-only --diff-filter=U'
+alias sumf='subl $(umf)'
+alias edsa='ember deploy staging --activate'
+alias radest='rake deploy staging'
 
 source /usr/share/bash-completion/completions/git
 
@@ -53,6 +59,7 @@ __git_complete gb _git_branch
 alias gs='git status'
 alias gcm='git commit'
 alias gcam='git commit -am'
+alias gca='git commit -a'
 alias gsl='git stash list'
 alias gss='git stash save'
 alias gsa='git stash apply'
@@ -60,8 +67,10 @@ alias gpr='git pull --rebase'
 alias gba='git branch -a'
 alias gl='git log'
 alias gf='git fetch'
+alias gfp='git fetch --prune'
 alias gph='git push'
 alias gpf='git push -f'
+alias gpffo='git pull --ff-only'
 alias grc='git rebase --continue'
 alias gra='git rebase --abort'
 alias grs='git rebase --skip'
@@ -82,15 +91,31 @@ alias c5='cd ../../../..'
 alias c6='cd ../../../../..'
 alias gcs='google-chrome-stable'
 
+# "Last Commit Message"
+alias lcm='git log -1 --pretty=%B'
+
+# Use this command to open a new pull request for the current branch, and immediatel open it in
+# Chrome.
+function hpr {
+  gcs $(hub pull-request -m "$(lcm)") &
+}
+
+function rds {
+  pushd $SW_HOME/rails
+  git push origin --delete staging
+  rake deploy:staging
+  popd
+}
+
 function rrfpuc {
-  pushd $SW_HOME
-  rake restore_from_production
+  pushd $SW_HOME/rails
+  rake restore_from_most_recent_production_backup
   popd
 }
 
 function rrfp {
   pushd $SW_HOME/rails
-  rake restore_from_most_recent_production_backup
+  rake restore_from_most_recent_saved_production_backup
   popd
 }
 
@@ -125,7 +150,7 @@ function rc {
 }
 
 function et {
-  pushd $SW_HOME/ember
+  pushd $SW_HOME/two
   ember test
   popd
 }
@@ -170,17 +195,26 @@ function sop {
   subl $(op)
 }
 
-function gpsu {
-  git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)
+function git_current_branch {
+  git rev-parse --abbrev-ref HEAD
 }
 
-# To delete local branches that have been merged, run:
-# git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+function gpsu {
+  git push --set-upstream origin $(git_current_branch)
+}
 
-# To prune danging remotes:
-# git fetch --prune
+function delete_merged_branches {
+  if [ "master" != $(git_current_branch) ];
+  then
+    echo 'The current branch is not master!'
+    return
+  fi
+  # To delete local branches that have been merged, run:
+  git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+}
 
 alias hrrc='heroku run rails console --app shearwater'
+alias hrrcs='heroku run rails console --app shearwater-staging'
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
 
