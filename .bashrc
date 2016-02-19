@@ -32,6 +32,7 @@ alias umf='git diff --name-only --diff-filter=U'
 alias sumf='subl $(umf)'
 alias edsa='ember deploy staging --activate'
 alias radest='rake deploy staging'
+alias vpr='gcs https://github.com/shearwater-intl/shearwater/pulls &'
 
 source /usr/share/bash-completion/completions/git
 
@@ -80,6 +81,8 @@ alias gco='git checkout --ours'
 
 alias s='subl'
 
+alias rdm='rake db:migrate'
+
 alias eb='subl ~/.bashrc'
 alias sb='source ~/.bashrc'
 
@@ -102,8 +105,27 @@ function hpr {
 
 function rds {
   pushd $SW_HOME/rails
+  rake deploy:staging
+  popd
+}
+
+function rdsf {
+  pushd $SW_HOME/rails
   git push origin --delete staging
   rake deploy:staging
+  popd
+}
+
+function rdp {
+  pushd $SW_HOME/rails
+  rake deploy:production
+  popd
+}
+
+function rdpf {
+  pushd $SW_HOME/rails
+  git push origin --delete production
+  rake deploy:production
   popd
 }
 
@@ -120,8 +142,8 @@ function rrfp {
 }
 
 function c {
-    cd $1
-    ls
+  cd $1
+  ls
 }
 
 function gpfr {
