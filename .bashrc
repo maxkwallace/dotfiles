@@ -1,6 +1,8 @@
 # SW_HOME is not exported, since no child process should need to access it.
 SW_HOME='/home/mkw/sw/shearwater'
 
+export SET_IN_REDIS_IN_DEVELOPMENT='true'
+
 export VISUAL=subl
 export EDITOR="$VISUAL"
 export GIT_EDITOR=vim
@@ -12,13 +14,14 @@ alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/repos/dotfiles/'
 
 alias ct='cd $SW_HOME/two'
+alias ca='cd $SW_HOME/admin'
 alias cs='cd $SW_HOME'
-alias ce='cd $SW_HOME/ember'
+alias cl='cd $SW_HOME/legacy'
 alias cea='cd $SW_HOME/ember/app'
 alias cr='cd $SW_HOME/rails'
 alias fn='find -type f -name'
 alias f='find -type f'
-alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name public -o -name vendor -o -name dist \) -prune -o -type f -print'
+alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name public -o -name vendor -o -path ./test/reports -o -name dist \) -prune -o -type f -print'
 alias gp='grep -E -i'
 alias gpni='grep -E'
 alias gpvni='grep -E -v'
@@ -30,9 +33,14 @@ alias cl='clear'
 alias spo='sudo poweroff'
 alias umf='git diff --name-only --diff-filter=U'
 alias sumf='subl $(umf)'
-alias edsa='ember deploy staging --activate'
 alias radest='rake deploy staging'
 alias vpr='gcs https://github.com/shearwater-intl/shearwater/pulls &'
+alias grm='git rebase master'
+alias vc='veracrypt'
+
+alias untracked_files='git ls-files --others --exclude-standard'
+alias utf='untracked_files'
+alias sutf='subl $(untracked_files)'
 
 source /usr/share/bash-completion/completions/git
 
@@ -92,7 +100,38 @@ alias c3='cd ../../..'
 alias c4='cd ../../../..'
 alias c5='cd ../../../..'
 alias c6='cd ../../../../..'
+
 alias gcs='google-chrome-stable'
+
+alias es='ember server --proxy http://localhost:3200'
+alias eso='ember server --proxy http://localhost:3200 --port 4000'
+alias rs='bundle exec bin/rails s --port=3200'
+
+# TODO: make this work.
+alias rrs='bundle exec rescue bin/rails s --port=3200'
+
+alias eds='ember deploy staging'
+alias edsa='ember deploy staging --activate'
+alias edd='ember deploy demo'
+alias edda='ember deploy demo --activate'
+alias edp='ember deploy production'
+alias edpa='ember deploy production --activate'
+
+alias et='ember test'
+
+function save_power {
+  sudo tlp start battery
+  sudo pm-powersave battery
+}
+
+function go_fast {
+  sudo tlp start ac
+  sudo pm-powersave ac
+}
+
+function sgl {
+  subl $(gpfr -l "$@")
+}
 
 # "Last Commit Message"
 alias lcm='git log -1 --pretty=%B'
@@ -100,12 +139,30 @@ alias lcm='git log -1 --pretty=%B'
 # Use this command to open a new pull request for the current branch, and immediatel open it in
 # Chrome.
 function hpr {
-  gcs $(hub pull-request -m "$(lcm)") &
+  gcs $(hub pull-request -m "$(lcm)" "$@") &
 }
+
+# TODO: rework the "force" versions of these commands to use:
+#   git subtree push --prefix web heroku master
+# or its ilk. When deleting and then re-creating the remote branch, Heroku's deploy hooks don't
+# always pick it up.
 
 function rds {
   pushd $SW_HOME/rails
   rake deploy:staging
+  popd
+}
+
+function rdd {
+  pushd $SW_HOME/rails
+  rake deploy:demo
+  popd
+}
+
+function rddf {
+  pushd $SW_HOME/rails
+  git push origin --delete demo
+  rake deploy:demo
   popd
 }
 
@@ -141,6 +198,14 @@ function rrfp {
   popd
 }
 
+# In the current feature branch-- how many commits do we have that aren't in master?
+function commits_ahead_of_master {
+  git rev-list $(current_branch) --not master | wc -l
+}
+
+# Rebase feature branch.
+alias rfb='git rebase -i HEAD~$(commits_ahead_of_master)'
+
 function c {
   cd $1
   ls
@@ -156,7 +221,7 @@ function gpnifr {
 
 function rbc {
   pushd $SW_HOME/rails
-  rubocop -D
+  rubocop -D "$@"
   popd
 }
 
@@ -171,27 +236,15 @@ function rc {
   popd
 }
 
-function et {
-  pushd $SW_HOME/two
-  ember test
-  popd
-}
-
 function rt {
   pushd $SW_HOME/rails
-  RAILS_ENV=test rake test
+  rake test
   popd
 }
 
-function rs {
+function rts {
   pushd $SW_HOME/rails
   rspec
-  popd
-}
-
-function es {
-  pushd $SW2_HOME
-  ember server
   popd
 }
 
@@ -217,16 +270,16 @@ function sop {
   subl $(op)
 }
 
-function git_current_branch {
+function current_branch {
   git rev-parse --abbrev-ref HEAD
 }
 
 function gpsu {
-  git push --set-upstream origin $(git_current_branch)
+  git push --set-upstream origin $(current_branch)
 }
 
 function delete_merged_branches {
-  if [ "master" != $(git_current_branch) ];
+  if [ "master" != $(current_branch) ];
   then
     echo 'The current branch is not master!'
     return
@@ -237,6 +290,7 @@ function delete_merged_branches {
 
 alias hrrc='heroku run rails console --app shearwater'
 alias hrrcs='heroku run rails console --app shearwater-staging'
+alias hrrcd='heroku run rails console --app shearwater-demo'
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
 
