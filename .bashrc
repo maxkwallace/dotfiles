@@ -1,7 +1,7 @@
 # SW_HOME is not exported, since no child process should need to access it.
 SW_HOME='/home/mkw/sw/shearwater'
 
-export SET_IN_REDIS_IN_DEVELOPMENT='true'
+# export SET_IN_REDIS_IN_DEVELOPMENT='true'
 
 export VISUAL=subl
 export EDITOR="$VISUAL"
@@ -9,9 +9,13 @@ export GIT_EDITOR=vim
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
+alias ll='ls -A1F'
+
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/repos/dotfiles/'
+
+alias er='elm reactor -a=localhost'
 
 alias ct='cd $SW_HOME/two'
 alias ca='cd $SW_HOME/admin'
@@ -21,7 +25,11 @@ alias cea='cd $SW_HOME/ember/app'
 alias cr='cd $SW_HOME/rails'
 alias fn='find -type f -name'
 alias f='find -type f'
-alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name public -o -name vendor -o -path ./test/reports -o -name dist \) -prune -o -type f -print'
+
+# The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
+alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name dist \) -prune -o -type f -print'
+alias frb='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -name dist \) -prune -o -type f -print'
+
 alias gp='grep -E -i'
 alias gpni='grep -E'
 alias gpvni='grep -E -v'
@@ -41,6 +49,9 @@ alias vc='veracrypt'
 alias untracked_files='git ls-files --others --exclude-standard'
 alias utf='untracked_files'
 alias sutf='subl $(untracked_files)'
+alias glsm='git ls-files -m'
+
+alias rmrfdt='rm -rf dist/* tmp/*'
 
 source /usr/share/bash-completion/completions/git
 
@@ -66,7 +77,8 @@ alias gb='git branch'
 __git_complete gb _git_branch
 
 alias gs='git status'
-alias gcm='git commit'
+alias gcm='git commit -m'
+alias gct='git commit'
 alias gcam='git commit -am'
 alias gca='git commit -a'
 alias gsl='git stash list'
@@ -87,9 +99,15 @@ alias gaa='git add -A'
 
 alias gco='git checkout --ours'
 
+alias ggpa='git rev-list --all | xargs git grep'
+
 alias s='subl'
 
 alias rdm='rake db:migrate'
+
+alias hrrdm='heroku run rake db:migrate -a shearwater'
+alias hrrdmd='heroku run rake db:migrate -a shearwater-demo'
+alias hrrdms='heroku run rake db:migrate -a shearwater-staging'
 
 alias eb='subl ~/.bashrc'
 alias sb='source ~/.bashrc'
@@ -103,9 +121,10 @@ alias c6='cd ../../../../..'
 
 alias gcs='google-chrome-stable'
 
-alias es='ember server --proxy http://localhost:3200'
-alias eso='ember server --proxy http://localhost:3200 --port 4000'
+alias es='ember serve --proxy http://localhost:3200'
 alias rs='bundle exec bin/rails s --port=3200'
+alias cts='ct && es'
+alias crs='cr && rs'
 
 # TODO: make this work.
 alias rrs='bundle exec rescue bin/rails s --port=3200'
@@ -118,6 +137,14 @@ alias edp='ember deploy production'
 alias edpa='ember deploy production --activate'
 
 alias et='ember test'
+
+function nsv {
+  npm show $1 version
+}
+
+function egm {
+  ember g model --pod true "$@"
+}
 
 function save_power {
   sudo tlp start battery
@@ -138,8 +165,16 @@ alias lcm='git log -1 --pretty=%B'
 
 # Use this command to open a new pull request for the current branch, and immediatel open it in
 # Chrome.
+# -m "$(lcm)"
 function hpr {
-  gcs $(hub pull-request -m "$(lcm)" "$@") &
+  template_text=`cat ~/PULL_REQUEST_TEMPLATE`
+#   last_commit_message=`lcm`
+#   newline=$'\n'
+#   message="$last_commit_message
+# $template_text"
+#   $message > ~/test_file
+#   echo $message
+  gcs $(hub pull-request -m "$(lcm)$template_text" "$@") &
 }
 
 # TODO: rework the "force" versions of these commands to use:
@@ -211,8 +246,29 @@ function c {
   ls
 }
 
+# $1 - the search pattern
+# $2 - the replace string
+function sr {
+  gpni -l $1 $(fr) | xargs -I filepath sed -i "s/$1/$2/g" filepath
+}
+
+# Do this later.
+# function srf {
+  # fr | gpni $1 | xargs -I filepath
+  # gpni -l $1 $(fr) | xargs -I filename echo
+# }
+
+# -n
+function srn {
+  gpni -l $1 $(fr)
+}
+
 function gpfr {
   gp --color "$@" $(fr)
+}
+
+function gpfrb {
+  gp --color "$@" $(frb)
 }
 
 function gpnifr {
@@ -278,6 +334,11 @@ function gpsu {
   git push --set-upstream origin $(current_branch)
 }
 
+function rcs {
+  mcs $1
+  eval "./$1"
+}
+
 function delete_merged_branches {
   if [ "master" != $(current_branch) ];
   then
@@ -288,9 +349,51 @@ function delete_merged_branches {
   git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
 }
 
+function sublime_create_project {
+  if [ -z "$1" ]; then
+    echo 'Error: a project name is required'
+    return
+  fi
+
+  project_name="${1%/}"
+  filename="$project_name.sublime-project"
+  touch $filename
+
+  # Tried <<-, didn't work-- can't get bash to automatically ignore leading whitespace.
+  tee $filename <<FILE_CONTENTS > /dev/null
+{
+  "folders":
+  [
+    {
+      "path": "$project_name"
+    }
+  ]
+}
+FILE_CONTENTS
+}
+
+alias scpt='sublime_create_project'
+
+function sublime_create_and_open_project {
+  sublime_create_project $1
+  subl "${1%/}.sublime-project"
+}
+
+alias scopt='sublime_create_and_open_project'
+
 alias hrrc='heroku run rails console --app shearwater'
 alias hrrcs='heroku run rails console --app shearwater-staging'
 alias hrrcd='heroku run rails console --app shearwater-demo'
+
+alias hlt='heroku logs --tail --app shearwater'
+alias hlts='heroku logs --tail --app shearwater-staging'
+alias hltd='heroku logs --tail --app shearwater-demo'
+
+alias hpgbc='heroku pg:backups capture -a shearwater'
+alias hpgbcs='heroku pg:backups capture -a shearwater-staging'
+alias hpgbcd='heroku pg:backups capture -a shearwater-demo'
+
+alias hppas='heroku pipelines:promote -a shearwater-staging'
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
 
@@ -381,7 +484,6 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # some more ls aliases
-alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
