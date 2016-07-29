@@ -163,17 +163,20 @@ function sgl {
 # "Last Commit Message"
 alias lcm='git log -1 --pretty=%B'
 
-# Use this command to open a new pull request for the current branch, and immediatel open it in
+# Use this command to open a new pull request for the current branch, and immediately open it in
 # Chrome.
 # -m "$(lcm)"
 function hpr {
   template_text=`cat ~/PULL_REQUEST_TEMPLATE`
-#   last_commit_message=`lcm`
-#   newline=$'\n'
-#   message="$last_commit_message
-# $template_text"
-#   $message > ~/test_file
-#   echo $message
+
+  # For reference, here's part of my previious implementation:
+  #   last_commit_message=`lcm`
+  #   newline=$'\n'
+  #   message="$last_commit_message
+  # $template_text"
+  #   $message > ~/test_file
+  #   echo $message
+
   gcs $(hub pull-request -m "$(lcm)$template_text" "$@") &
 }
 
@@ -252,7 +255,7 @@ function sr {
   gpni -l $1 $(fr) | xargs -I filepath sed -i "s/$1/$2/g" filepath
 }
 
-# Do this later.
+# This function is commented out until I have a chance to finish it.
 # function srf {
   # fr | gpni $1 | xargs -I filepath
   # gpni -l $1 $(fr) | xargs -I filename echo
