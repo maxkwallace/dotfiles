@@ -1,5 +1,8 @@
-# SW_HOME is not exported, since no child process should need to access it.
-SW_HOME='/home/mkw/sw/shearwater'
+# MC_HOME is not exported, since no child process should need to access it.
+MC_HOME='/home/mkw/mc'
+MC_EMBER_HOME="$MC_HOME/mentorcollective-ember/ember"
+MC_EMBER_ADMIN_HOME="$MC_HOME/mentorcollective-ember/admin"
+MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
 
@@ -9,22 +12,22 @@ export GIT_EDITOR=vim
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
-alias ll='ls -A1F'
-
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/repos/dotfiles/'
 
-alias er='elm reactor -a=localhost'
+alias cs='cd $MC_HOME'
+alias cm='cd $MC_HOME'
+alias ce='cd $MC_EMBER_HOME'
+alias cea='cd $MC_EMBER_HOME/app'
 
-alias ct='cd $SW_HOME/two'
-alias ca='cd $SW_HOME/admin'
-alias cs='cd $SW_HOME'
-alias cl='cd $SW_HOME/legacy'
-alias cea='cd $SW_HOME/ember/app'
-alias cr='cd $SW_HOME/rails'
+alias cr='cd $MC_RAILS_HOME'
+alias ctd='cd $MC_HOME/typeform_data'
+
 alias fn='find -type f -name'
 alias f='find -type f'
+
+alias ll='ls -A1F'
 
 # The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
 alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name dist \) -prune -o -type f -print'
@@ -34,21 +37,26 @@ alias gp='grep -E -i'
 alias gpni='grep -E'
 alias gpvni='grep -E -v'
 alias gpv='grep -E -v -i'
+
 alias sagi='sudo apt-get install'
 alias sagu='sudo apt-get update'
 alias sag='sudo apt-get'
+
 alias cl='clear'
 alias spo='sudo poweroff'
+
 alias umf='git diff --name-only --diff-filter=U'
 alias sumf='subl $(umf)'
-alias radest='rake deploy staging'
-alias vpr='gcs https://github.com/shearwater-intl/shearwater/pulls &'
-alias grm='git rebase master'
+
 alias vc='veracrypt'
+
+alias vepr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
+alias vrpr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
 
 alias untracked_files='git ls-files --others --exclude-standard'
 alias utf='untracked_files'
 alias sutf='subl $(untracked_files)'
+
 alias glsm='git ls-files -m'
 
 alias rmrfdt='rm -rf dist/* tmp/*'
@@ -92,6 +100,7 @@ alias gfp='git fetch --prune'
 alias gph='git push'
 alias gpf='git push -f'
 alias gpffo='git pull --ff-only'
+alias grm='git rebase master'
 alias grc='git rebase --continue'
 alias gra='git rebase --abort'
 alias grs='git rebase --skip'
@@ -109,6 +118,8 @@ alias hrrdm='heroku run rake db:migrate -a shearwater'
 alias hrrdmd='heroku run rake db:migrate -a shearwater-demo'
 alias hrrdms='heroku run rake db:migrate -a shearwater-staging'
 
+alias rcpts='rake copy_production_to_staging'
+
 alias eb='subl ~/.bashrc'
 alias sb='source ~/.bashrc'
 
@@ -123,7 +134,7 @@ alias gcs='google-chrome-stable'
 
 alias es='ember serve --proxy http://localhost:3200'
 alias rs='bundle exec bin/rails s --port=3200'
-alias cts='ct && es'
+alias ces='ce && es'
 alias crs='cr && rs'
 
 # TODO: make this work.
@@ -137,6 +148,8 @@ alias edp='ember deploy production'
 alias edpa='ember deploy production --activate'
 
 alias et='ember test'
+
+alias er='elm reactor -a=localhost'
 
 function nsv {
   npm show $1 version
@@ -185,53 +198,19 @@ function hpr {
 # or its ilk. When deleting and then re-creating the remote branch, Heroku's deploy hooks don't
 # always pick it up.
 
-function rds {
-  pushd $SW_HOME/rails
-  rake deploy:staging
-  popd
-}
-
 function rdd {
-  pushd $SW_HOME/rails
-  rake deploy:demo
-  popd
-}
-
-function rddf {
-  pushd $SW_HOME/rails
-  git push origin --delete demo
-  rake deploy:demo
-  popd
-}
-
-function rdsf {
-  pushd $SW_HOME/rails
-  git push origin --delete staging
-  rake deploy:staging
-  popd
-}
-
-function rdp {
-  pushd $SW_HOME/rails
-  rake deploy:production
-  popd
-}
-
-function rdpf {
-  pushd $SW_HOME/rails
-  git push origin --delete production
-  rake deploy:production
-  popd
+  # Implement!
+  exit 1
 }
 
 function rrfpuc {
-  pushd $SW_HOME/rails
+  pushd $MC_RAILS_HOME
   rake restore_from_most_recent_production_backup
   popd
 }
 
 function rrfp {
-  pushd $SW_HOME/rails
+  pushd $MC_RAILS_HOME
   rake restore_from_most_recent_saved_production_backup
   popd
 }
@@ -279,31 +258,18 @@ function gpnifr {
 }
 
 function rbc {
-  pushd $SW_HOME/rails
-  rubocop -D "$@"
-  popd
-}
-
-function rr {
-  cd $SW_HOME
-  rake run
+  rubocop -D -a "$@"
 }
 
 function rc {
-  pushd $SW_HOME/rails
+  pushd $MC_RAILS_HOME
   bin/rails console
   popd
 }
 
 function rt {
-  pushd $SW_HOME/rails
+  pushd $MC_RAILS_HOME
   rake test
-  popd
-}
-
-function rts {
-  pushd $SW_HOME/rails
-  rspec
   popd
 }
 
@@ -520,6 +486,8 @@ alias br='brightness'
 function brightness {
     sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
 }
+
+source ~/other
 
 # I changed the heroku directory to be added to the end of the PATH rather than the beginning--
 # this was causing issues with RVM.
