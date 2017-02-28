@@ -14,7 +14,7 @@ function join { local IFS="$1"; shift; echo "$*"; }
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
-alias cb='cd ~/repos/dotfiles/'
+alias cb='cd ~/my-repos/dotfiles/'
 
 alias cs='cd $MC_HOME'
 alias cm='cd $MC_HOME'
@@ -40,6 +40,7 @@ alias gpv='grep -E -v -i'
 
 alias sagi='sudo apt-get install'
 alias sagu='sudo apt-get update'
+alias sagug='sudo apt-get upgrade'
 alias sag='sudo apt-get'
 
 alias cl='clear'
@@ -98,7 +99,6 @@ alias gl='git log'
 alias gf='git fetch'
 alias gfp='git fetch --prune'
 alias gph='git push'
-alias gpf='git push -f'
 alias gpffo='git pull --ff-only'
 alias grm='git rebase master'
 alias grc='git rebase --continue'
@@ -109,6 +109,8 @@ alias gaa='git add -A'
 alias gco='git checkout --ours'
 
 alias ggpa='git rev-list --all | xargs git grep'
+
+alias lola='git log --graph --decorate --pretty=oneline --abbrev-commit --all'
 
 alias s='subl'
 
@@ -146,10 +148,13 @@ alias edd='ember deploy demo'
 alias edda='ember deploy demo --activate'
 alias edp='ember deploy production'
 alias edpa='ember deploy production --activate'
+alias edpma='ember deploy prodmirror --activate'
 
 alias et='ember test'
 
 alias er='elm reactor -a=localhost'
+
+alias fix_wifi='sudo systemctl restart network-manager.service'
 
 function nsv {
   npm show $1 version
@@ -176,11 +181,27 @@ function sgl {
 # "Last Commit Message"
 alias lcm='git log -1 --pretty=%B'
 
+# All credit goes to http://stackoverflow.com/a/24642735/1067145
+function dnif {
+  # Recursively list a file from PWD up the directory tree to root
+  [[ -n $1 ]] || { echo "dnif [ls-opts] name"; return 1; }
+  local THERE=$PWD RC=2
+  while [[ $THERE != / ]]
+      do [[ -e $THERE/${2:-$1} ]] && { ls ${2:+$1} $THERE/${2:-$1}; RC=0; }
+          THERE=$(dirname $THERE)
+      done
+  [[ -e $THERE/${2:-$1} ]] && { ls ${2:+$1} /${2:-$1}; RC=0; }
+  return $RC
+}
+
 # Use this command to open a new pull request for the current branch, and immediately open it in
 # Chrome.
 # -m "$(lcm)"
 function hpr {
-  template_text=`cat ~/PULL_REQUEST_TEMPLATE`
+  newline='
+'
+  content=`cat $(dnif PULL_REQUEST_TEMPLATE)`
+  template_text=$newline$content
 
   # For reference, here's part of my previious implementation:
   #   last_commit_message=`lcm`
@@ -190,7 +211,7 @@ function hpr {
   #   $message > ~/test_file
   #   echo $message
 
-  gcs $(hub pull-request -m "$(lcm)$template_text" "$@") &
+  gcs $(hub pull-request -m "$(current_branch)$template_text" "$@") &
 }
 
 # TODO: rework the "force" versions of these commands to use:
@@ -222,6 +243,8 @@ function commits_ahead_of_master {
 
 # Rebase feature branch.
 alias rfb='git rebase -i HEAD~$(commits_ahead_of_master)'
+
+alias cam='commits_ahead_of_master'
 
 function c {
   cd $1
@@ -357,12 +380,21 @@ alias hrrcd='heroku run rails console --app shearwater-demo'
 alias hlt='heroku logs --tail --app shearwater'
 alias hlts='heroku logs --tail --app shearwater-staging'
 alias hltd='heroku logs --tail --app shearwater-demo'
+alias hltpm='heroku logs --tail --app shearwater-prodmirror'
 
 alias hpgbc='heroku pg:backups capture -a shearwater'
 alias hpgbcs='heroku pg:backups capture -a shearwater-staging'
 alias hpgbcd='heroku pg:backups capture -a shearwater-demo'
 
 alias hppas='heroku pipelines:promote -a shearwater-staging'
+
+# MSR means Model-specific register. 0x19a has something to do with clock modulation / power
+# conservation.
+#
+# See: http://askubuntu.com/questions/792605/ubuntu-16-04-lts-too-slow-after-suspend-and-resume
+alias rd_speed_msr='sudo rdmsr -a 0x19a'
+alias wr_speed_msr='sudo wrmsr -a 0x19a 0x0'
+
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
 
@@ -491,8 +523,6 @@ alias br='brightness'
 function brightness {
     sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
 }
-
-source ~/other
 
 # I changed the heroku directory to be added to the end of the PATH rather than the beginning--
 # this was causing issues with RVM.
