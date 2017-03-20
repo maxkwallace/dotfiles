@@ -284,6 +284,10 @@ function rbc {
   rubocop -D -a "$@"
 }
 
+function rbd {
+  rubocop -D "$@"
+}
+
 function rc {
   pushd $MC_RAILS_HOME
   bin/rails console
@@ -534,3 +538,6 @@ export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
 export NVM_DIR="/home/mkw/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# If you need a newline in a string, you must use $'\n'.
+alias rff='runhaskell ~/my-repos/hsutils/regex-remove-from-files.hs'
