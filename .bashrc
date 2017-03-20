@@ -462,6 +462,9 @@ fi
 
 if [ "$color_prompt" = yes ]; then
   # Edited by Max:
+  #
+  # Note to self: I tried customizing this to add the current working git branch (__git_ps1), but
+  # that seemed to make the terminal too slow for my liking.
   if [ $(hostname) = "mkw-Precision-M4600" ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@M4600\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
   else
