@@ -1,5 +1,5 @@
 # MC_HOME is not exported, since no child process should need to access it.
-MC_HOME='/home/mkw/mc'
+MC_HOME='~/mc'
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember/ember"
 MC_EMBER_ADMIN_HOME="$MC_HOME/mentorcollective-ember/admin"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
@@ -16,13 +16,14 @@ alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/my-repos/dotfiles/'
 
-alias cs='cd $MC_HOME'
-alias cm='cd $MC_HOME'
-alias ce='cd $MC_EMBER_HOME'
-alias cea='cd $MC_EMBER_HOME/app'
+# These aliases don't work on OSX unless we use double quotes:
+alias cs="cd $MC_HOME"
+alias cm="cd $MC_HOME"
+alias ce="cd $MC_EMBER_HOME"
+alias cea="cd $MC_EMBER_HOME/app"
 
-alias cr='cd $MC_RAILS_HOME'
-alias ctd='cd $MC_HOME/typeform_data'
+alias cr="cd $MC_RAILS_HOME"
+alias ctd="cd $MC_HOME/typeform_data"
 
 alias fn='find -type f -name'
 alias f='find -type f'
@@ -544,7 +545,7 @@ export PATH="$PATH:/usr/local/heroku/bin"
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
-export NVM_DIR="/home/mkw/.nvm"
+export NVM_DIR="~/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # If you need a newline in a string, you must use $'\n'.
