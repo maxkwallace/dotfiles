@@ -1,5 +1,5 @@
 # MC_HOME is not exported, since no child process should need to access it.
-MC_HOME='~/mc'
+MC_HOME="~/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember/ember"
 MC_EMBER_ADMIN_HOME="$MC_HOME/mentorcollective-ember/admin"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
@@ -16,11 +16,12 @@ alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/my-repos/dotfiles/'
 
-# These aliases don't work on OSX unless we use double quotes:
+# These aliases don't work on OSX without using double quotes.
 alias cs="cd $MC_HOME"
 alias cm="cd $MC_HOME"
 alias ce="cd $MC_EMBER_HOME"
 alias cea="cd $MC_EMBER_HOME/app"
+alias cf="cd ~/sandbox/rails-sandbox/foo"
 
 alias cr="cd $MC_RAILS_HOME"
 alias ctd="cd $MC_HOME/typeform_data"
@@ -87,7 +88,7 @@ alias gb='git branch'
 __git_complete gb _git_branch
 
 alias gs='git status'
-alias gcm='git commit -m'
+alias gcm='git checkout master'
 alias gct='git commit'
 alias gcam='git commit -am'
 alias gca='git commit -a'
@@ -179,6 +180,12 @@ function sgl {
   subl $(gpfr -l "$@")
 }
 
+function gdcm {
+  local branch=$(current_branch)
+  git checkout master
+  git branch -D $branch
+}
+
 # "Last Commit Message"
 alias lcm='git log -1 --pretty=%B'
 
@@ -252,6 +259,7 @@ function c {
   ls
 }
 
+# Can be used to rename, e.g. methods.
 # $1 - the search pattern
 # $2 - the replace string
 function sr {
@@ -346,6 +354,17 @@ function delete_merged_branches {
   git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
 }
 
+function delete_elis_branches {
+  if [ "master" != $(current_branch) ];
+  then
+    echo 'The current branch is not master!'
+    return
+  fi
+  git branch | grep '^  eli-' | xargs -n 1 git branch -D
+}
+
+alias desbs='delete_elis_branches'
+
 function sublime_create_project {
   if [ -z "$1" ]; then
     echo 'Error: a project name is required'
@@ -400,6 +419,13 @@ alias hppas='heroku pipelines:promote -a shearwater-staging'
 alias rd_speed_msr='sudo rdmsr -a 0x19a'
 alias wr_speed_msr='sudo wrmsr -a 0x19a 0x0'
 
+# to_mp3 only works on on file per command-- if you want to convert multiple files, you'll need
+# something like:
+# for f in *; do to_mp3 "$f"; done
+function to_mp3 {
+  input=$1
+  avconv -i "$input" -qscale:a 0 "${input%.*}.mp3"
+}
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
 
