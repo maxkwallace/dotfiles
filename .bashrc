@@ -1,10 +1,15 @@
 # MC_HOME is not exported, since no child process should need to access it.
-MC_HOME="~/mc"
+MC_HOME="$HOME/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember/ember"
 MC_EMBER_ADMIN_HOME="$MC_HOME/mentorcollective-ember/admin"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
+
+# Note to self-- single vs. double quotes:
+# - Single quotes perserve the literal value of each character in the quotes-- no interpolation.
+# - Double quotes do the same, except for $, `, \, and !
+# See http://stackoverflow.com/a/6697781/1067145
 
 export VISUAL=subl
 export EDITOR="$VISUAL"
@@ -262,8 +267,10 @@ function c {
 # Can be used to rename, e.g. methods.
 # $1 - the search pattern
 # $2 - the replace string
+#
+# In sed, the -E flag (for Extended regex support) reverses the meaning of "(" and "\(".
 function sr {
-  gpni -l $1 $(fr) | xargs -I filepath sed -i "s/$1/$2/g" filepath
+  gpni -l "$1" $(fr) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
 }
 
 # This function is commented out until I have a chance to finish it.
