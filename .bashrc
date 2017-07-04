@@ -15,6 +15,9 @@ export VISUAL=subl
 export EDITOR="$VISUAL"
 export GIT_EDITOR=vim
 
+# For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
+export PATH=~/.local/bin:$PATH
+
 function join { local IFS="$1"; shift; echo "$*"; }
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
@@ -29,6 +32,7 @@ alias cea="cd $MC_EMBER_HOME/app"
 alias cf="cd ~/sandbox/rails-sandbox/foo"
 
 alias cr="cd $MC_RAILS_HOME"
+alias cn="cd $MC_HOME/mentorcollective-elm/MentorCollective"
 alias ctd="cd $MC_HOME/typeform_data"
 
 alias fn='find -type f -name'
@@ -37,8 +41,8 @@ alias f='find -type f'
 alias ll='ls -A1F'
 
 # The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
-alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name dist \) -prune -o -type f -print'
-alias frb='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -name dist \) -prune -o -type f -print'
+alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+alias frb='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
 
 alias gp='grep -E -i'
 alias gpni='grep -E'
@@ -130,7 +134,9 @@ alias hrrdms='heroku run rake db:migrate -a shearwater-staging'
 alias rcpts='rake copy_production_to_staging'
 
 alias eb='subl ~/.bashrc'
+alias ebp='subl ~/.bash_profile'
 alias sb='source ~/.bashrc'
+alias sbp='source ~/.bash_profile'
 
 alias c1='cd ..'
 alias c2='cd ../..'
@@ -163,6 +169,8 @@ alias er='elm reactor -a=localhost'
 
 alias fix_wifi='sudo systemctl restart network-manager.service'
 
+alias ras='/usr/local/android-studio/bin/studio.sh &'
+
 function nsv {
   npm show $1 version
 }
@@ -183,6 +191,10 @@ function go_fast {
 
 function sgl {
   subl $(gpfr -l "$@")
+}
+
+function sglni {
+  subl $(gpnifr -l "$@")
 }
 
 function gdcm {
@@ -273,6 +285,11 @@ function sr {
   gpni -l "$1" $(fr) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
 }
 
+function srcrm {
+  gpni -l "$1" $(crm) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
+}
+
+
 # This function is commented out until I have a chance to finish it.
 # function srf {
   # fr | gpni $1 | xargs -I filepath
@@ -297,6 +314,14 @@ function gpnifr {
 }
 
 function rbc {
+  rubocop -D -a $(changed_relative_to_master | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+}
+
+function rbcna {
+  rubocop -D $(changed_relative_to_master | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+}
+
+function rbca {
   rubocop -D -a "$@"
 }
 
@@ -313,6 +338,12 @@ function rc {
 function rt {
   pushd $MC_RAILS_HOME
   rake test
+  popd
+}
+
+function rtns {
+  pushd $MC_RAILS_HOME
+  SHEARWATER_DONT_SKIP_TESTS=true rake test
   popd
 }
 
@@ -402,11 +433,24 @@ function sublime_create_and_open_project {
   subl "${1%/}.sublime-project"
 }
 
+function set_up_repo {
+  array_form=(${1//\// })
+  folder_name=${array_form[1]}
+
+  cd ~/repos
+  mkdir $folder_name
+  cd ~/repos/$folder_name
+
+  git clone 'git@github.com:'$1'.git'
+  sublime_create_and_open_project $folder_name'/'
+}
+
 alias scopt='sublime_create_and_open_project'
 
 alias hrrc='heroku run rails console --app shearwater'
 alias hrrcs='heroku run rails console --app shearwater-staging'
 alias hrrcd='heroku run rails console --app shearwater-demo'
+alias hrrcpm='heroku run rails console --app shearwater-prodmirror'
 
 alias hlt='heroku logs --tail --app shearwater'
 alias hlts='heroku logs --tail --app shearwater-staging'
@@ -433,6 +477,20 @@ function to_mp3 {
   input=$1
   avconv -i "$input" -qscale:a 0 "${input%.*}.mp3"
 }
+
+alias changed_relative_to_master='g diff --name-only master'
+alias crm='changed_relative_to_master'
+
+
+
+
+
+
+
+
+
+
+
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
 
@@ -582,4 +640,14 @@ export NVM_DIR="~/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # If you need a newline in a string, you must use $'\n'.
+# rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
 alias rff='runhaskell ~/my-repos/hsutils/regex-remove-from-files.hs'
+
+function crff {
+  git commit -am "Remove lines matching $1"
+}
+
+# Does not work for some reason :(
+# function rbp {
+#   rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
+# }
