@@ -32,7 +32,8 @@ alias cea="cd $MC_EMBER_HOME/app"
 alias cf="cd ~/sandbox/rails-sandbox/foo"
 
 alias cr="cd $MC_RAILS_HOME"
-alias cn="cd $MC_HOME/mentorcollective-elm/MentorCollective"
+alias cn="cd $MC_HOME/mentorcollective-elm/mentor-collective"
+alias cnw="cd $MC_HOME/mentorcollective-elm/mentor-collective/web/src"
 alias ctd="cd $MC_HOME/typeform_data"
 
 alias fn='find -type f -name'
@@ -148,12 +149,9 @@ alias c6='cd ../../../../..'
 alias gcs='google-chrome-stable'
 
 alias es='ember serve --proxy http://localhost:3200'
-alias rs='bundle exec bin/rails s --port=3200'
+alias rs='bundle exec bin/rails s --port 3200' # port=3200 doesn't work; I'm not sure why.
 alias ces='ce && es'
 alias crs='cr && rs'
-
-# TODO: make this work.
-alias rrs='bundle exec rescue bin/rails s --port=3200'
 
 alias eds='ember deploy staging'
 alias edsa='ember deploy staging --activate'
@@ -223,8 +221,7 @@ function dnif {
 # Chrome.
 # -m "$(lcm)"
 function hpr {
-  newline='
-'
+  newline=$'\n'
   content=`cat $(dnif PULL_REQUEST_TEMPLATE)`
   template_text=$newline$content
 
