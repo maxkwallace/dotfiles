@@ -1,7 +1,6 @@
 # MC_HOME is not exported, since no child process should need to access it.
 MC_HOME="$HOME/mc"
-MC_EMBER_HOME="$MC_HOME/mentorcollective-ember/ember"
-MC_EMBER_ADMIN_HOME="$MC_HOME/mentorcollective-ember/admin"
+MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
@@ -42,8 +41,8 @@ alias f='find -type f'
 alias ll='ls -A1F'
 
 # The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
-alias fr='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
-alias frb='find . \( -name .git -o -name tmp -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
 
 alias gp='grep -E -i'
 alias gpni='grep -E'
@@ -168,6 +167,12 @@ alias er='elm reactor -a=localhost'
 alias fix_wifi='sudo systemctl restart network-manager.service'
 
 alias ras='/usr/local/android-studio/bin/studio.sh &'
+
+# "list installed packages"
+alias lip='apt list --installed'
+
+# To remove a package:
+# sudo apt-get remove <application_name>
 
 function nsv {
   npm show $1 version
@@ -442,6 +447,23 @@ function set_up_repo {
   sublime_create_and_open_project $folder_name'/'
 }
 
+function set_up_candidate_repo {
+  array_form=(${1//\// })
+  gh_username=${array_form[0]}
+  folder_name=${array_form[1]}
+
+  cd ~/candidates
+
+  mkdir $gh_username
+  cd $gh_username
+
+  mkdir $folder_name
+  cd $folder_name
+
+  git clone 'git@github.com:'$1'.git'
+  sublime_create_and_open_project $folder_name'/'
+}
+
 alias scopt='sublime_create_and_open_project'
 
 alias hrrc='heroku run rails console --app shearwater'
@@ -632,9 +654,6 @@ function brightness {
 export PATH="$PATH:/usr/local/heroku/bin"
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
-export NVM_DIR="~/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # If you need a newline in a string, you must use $'\n'.
 # rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
