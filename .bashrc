@@ -3,6 +3,10 @@ MC_HOME="$HOME/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
+# Commands to memorize:
+# List total sizes of directories in current folder: du -sh -- *
+alias dush='du -sh -- *'
+
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
 
 # Note to self-- single vs. double quotes:
@@ -500,14 +504,25 @@ function to_mp3 {
 alias changed_relative_to_master='g diff --name-only master'
 alias crm='changed_relative_to_master'
 
+function dl_yt_audio {
+  youtube-dl -f 'bestaudio' -o 'download.%(ext)s' $1
 
+  if [ ! -f download.webm ]; then
+      echo "Didn't get a webm"
+      return
+  fi
 
+  ffmpeg -i "download.webm" -vn -acodec copy "audio.opus"
 
+  if [ ! -f audio.opus ]; then
+      echo "No audio.opus file"
+      return
+  fi
 
-
-
-
-
+  ffmpeg -i "audio.opus" "audio.flac"
+  rm download.webm
+  rm audio.opus
+}
 
 
 
@@ -642,6 +657,7 @@ fi
 
 #### -- END DEFAULT SECTION -- ####
 
+# Added Feb. 4, 2018: use xbacklight instead.
 alias br='brightness'
 function brightness {
     sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
