@@ -27,7 +27,7 @@ function join { local IFS="$1"; shift; echo "$*"; }
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
-alias cb='cd ~/my-repos/dotfiles/'
+alias cb='cd ~/Documents/repos/dotfiles/'
 
 # These aliases don't work on OSX without using double quotes.
 alias cs="cd $MC_HOME"
@@ -578,14 +578,14 @@ esac
 #force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
-  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-  # We have color support; assume it's compliant with Ecma-48
-  # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-  # a case would tend to support setf rather than setaf.)
-  color_prompt=yes
-    else
-  color_prompt=
-    fi
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+      else
+    color_prompt=
+      fi
 fi
 
 if [ "$color_prompt" = yes ]; then
@@ -593,7 +593,7 @@ if [ "$color_prompt" = yes ]; then
   #
   # Note to self: I tried customizing this to add the current working git branch (__git_ps1), but
   # that seemed to make the terminal too slow for my liking.
-  if [ $(hostname) = "mkw-Precision-M4600" ]; then
+  if [ $(hostname) = "mkw-M4800" ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@M4600\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
   else
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
@@ -675,7 +675,7 @@ export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
 # If you need a newline in a string, you must use $'\n'.
 # rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
-alias rff='runhaskell ~/my-repos/hsutils/regex-remove-from-files.hs'
+alias rff='runhaskell ~/Documents/repos/hsutils/regex-remove-from-files.hs'
 
 function crff {
   git commit -am "Remove lines matching $1"
