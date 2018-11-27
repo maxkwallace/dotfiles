@@ -7,6 +7,8 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 # List total sizes of directories in current folder: du -sh -- *
 alias dush='du -sh -- *'
 
+# ls -a | sort -> to get a row-by-row list of names only
+
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
 
 # Note to self-- single vs. double quotes:
