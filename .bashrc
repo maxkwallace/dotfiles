@@ -3,11 +3,27 @@ MC_HOME="$HOME/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
-# Commands to memorize:
+
+
+# Utility commands:
 # List total sizes of directories in current folder: du -sh -- *
 alias dush='du -sh -- *'
 
+# Find the biggest files in subdirectories.
+# find -type f -exec du -Sh {} + | sort -rh | head -n 5
+
+# Use the rename command to rename multiple files:
+# rename 's/ /-/g' *
+
 # ls -a | sort -> to get a row-by-row list of names only
+
+# Convert to FLAC:
+# mkdir flac
+# for i in *; do ffmpeg -i "$i" "flac/${i::-4}.flac"; done
+
+
+# For Redshift issues:
+# https://github.com/xflux-gui/fluxgui/issues/27
 
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
 
@@ -23,11 +39,14 @@ export GIT_EDITOR=vim
 # For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
 export PATH=~/.local/bin:$PATH
 
+alias python=python3
+
 function join { local IFS="$1"; shift; echo "$*"; }
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/Documents/repos/dotfiles/'
+alias se='source'
 
 # These aliases don't work on OSX without using double quotes.
 alias cs="cd $MC_HOME"
@@ -36,7 +55,7 @@ alias ce="cd $MC_EMBER_HOME"
 alias cea="cd $MC_EMBER_HOME/app"
 alias cf="cd ~/sandbox/rails-sandbox/foo"
 
-alias cr="cd $MC_RAILS_HOME"
+alias cr="cd ~/Documents/repos"
 alias cn="cd $MC_HOME/mentorcollective-elm/mentor-collective"
 alias cnw="cd $MC_HOME/mentorcollective-elm/mentor-collective/web/src"
 alias ctd="cd $MC_HOME/typeform_data"
@@ -309,6 +328,10 @@ function srn {
   gpni -l $1 $(fr)
 }
 
+function gpf {
+  gp --color "$@" $(f)
+}
+
 function gpfr {
   gp --color "$@" $(fr)
 }
@@ -441,6 +464,8 @@ function sublime_create_and_open_project {
   subl "${1%/}.sublime-project"
 }
 
+# Call like:
+# :~$ set_up_repo username/repo-name
 function set_up_repo {
   array_form=(${1//\// })
   folder_name=${array_form[1]}
@@ -495,7 +520,7 @@ alias hppas='heroku pipelines:promote -a shearwater-staging'
 alias rd_speed_msr='sudo rdmsr -a 0x19a'
 alias wr_speed_msr='sudo wrmsr -a 0x19a 0x0'
 
-# to_mp3 only works on on file per command-- if you want to convert multiple files, you'll need
+# to_mp3 only works on one file per command-- if you want to convert multiple files, you'll need
 # something like:
 # for f in *; do to_mp3 "$f"; done
 function to_mp3 {
@@ -506,6 +531,7 @@ function to_mp3 {
 alias changed_relative_to_master='g diff --name-only master'
 alias crm='changed_relative_to_master'
 
+# Install youtube-dl (ffmpeg should already be installed)
 function dl_yt_audio {
   youtube-dl -f 'bestaudio' -o 'download.%(ext)s' $1
 
@@ -659,7 +685,8 @@ fi
 
 #### -- END DEFAULT SECTION -- ####
 
-# Added Feb. 4, 2018: use xbacklight instead.
+# Update, 2018-02-04: use xbacklight instead.
+# Update, 2019-01-02: use the Ubuntu brightness GUI.
 alias br='brightness'
 function brightness {
     sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
