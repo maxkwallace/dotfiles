@@ -21,6 +21,9 @@ alias dush='du -sh -- *'
 # mkdir flac
 # for i in *; do ffmpeg -i "$i" "flac/${i::-4}.flac"; done
 
+# Unzip all zipfiles in subdirectories and delete the archives:
+# find . -depth -name '*.zip' -execdir /usr/bin/unzip -n {} \; -delete
+
 
 # For Redshift issues:
 # https://github.com/xflux-gui/fluxgui/issues/27
@@ -54,6 +57,8 @@ alias cm="cd $MC_HOME"
 alias ce="cd $MC_EMBER_HOME"
 alias cea="cd $MC_EMBER_HOME/app"
 alias cf="cd ~/sandbox/rails-sandbox/foo"
+alias crep="cd ~/Documents/repos/recordexpungPDX/recordexpungPDX"
+alias crepf="cd ~/Documents/repos/recordexpungPDX/recordexpungPDX/src/frontend"
 
 alias cr="cd ~/Documents/repos"
 alias cn="cd $MC_HOME/mentorcollective-elm/mentor-collective"
@@ -68,6 +73,22 @@ alias ll='ls -A1F'
 # The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
 alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
 alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+
+# Find all files without spaces in their names.
+alias fs='find . -type f ! -iregex "\./.+ .+" -print'
+
+# Includes the test from fs to filter out filenames containing spaces.
+alias frs='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f ! -iregex "\./.+ .+" -print'
+
+# 2019-05-10 hacking on find commands.
+# find . ! -iregex '.*/[\.a-z0-9-]*'
+# "!" negates the following test, regexes match the whole file path.
+#
+# find everything:
+# find . -iregex '\./.+'
+#
+# find everything that doesn't contain a space:
+# find . ! -iregex '\./.+ .+'
 
 alias gp='grep -E -i'
 alias gpni='grep -E'
@@ -332,6 +353,10 @@ function gpf {
   gp --color "$@" $(f)
 }
 
+function gpfs {
+  gp --color "$@" $(fs)
+}
+
 function gpfr {
   gp --color "$@" $(fr)
 }
@@ -457,12 +482,13 @@ function sublime_create_project {
 FILE_CONTENTS
 }
 
-alias scpt='sublime_create_project'
-
 function sublime_create_and_open_project {
   sublime_create_project $1
   subl "${1%/}.sublime-project"
 }
+
+alias scpt='sublime_create_project'
+alias scopt='sublime_create_and_open_project'
 
 # Call like:
 # :~$ set_up_repo username/repo-name
@@ -494,8 +520,6 @@ function set_up_candidate_repo {
   git clone 'git@github.com:'$1'.git'
   sublime_create_and_open_project $folder_name'/'
 }
-
-alias scopt='sublime_create_and_open_project'
 
 alias hrrc='heroku run rails console --app shearwater'
 alias hrrcs='heroku run rails console --app shearwater-staging'
@@ -549,7 +573,7 @@ function dl_yt_audio {
 
   ffmpeg -i "audio.opus" "audio.flac"
   rm download.webm
-  rm audio.opus
+  # rm audio.opus
 }
 
 
@@ -712,3 +736,7 @@ function crff {
 # function rbp {
 #   rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
 # }
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
