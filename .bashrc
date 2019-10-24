@@ -3,8 +3,6 @@ MC_HOME="$HOME/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
-
-
 # Utility commands:
 # List total sizes of directories in current folder: du -sh -- *
 alias dush='du -sh -- *'
@@ -20,6 +18,9 @@ alias dush='du -sh -- *'
 # Convert to FLAC:
 # mkdir flac
 # for i in *; do ffmpeg -i "$i" "flac/${i::-4}.flac"; done
+
+# Convert webp:
+# dwebp file.webp -o abc.png
 
 # Unzip all zipfiles in subdirectories and delete the archives:
 # find . -depth -name '*.zip' -execdir /usr/bin/unzip -n {} \; -delete
@@ -57,8 +58,14 @@ alias cm="cd $MC_HOME"
 alias ce="cd $MC_EMBER_HOME"
 alias cea="cd $MC_EMBER_HOME/app"
 alias cf="cd ~/sandbox/rails-sandbox/foo"
-alias crep="cd ~/Documents/repos/recordexpungPDX/recordexpungPDX"
-alias crepf="cd ~/Documents/repos/recordexpungPDX/recordexpungPDX/src/frontend"
+
+alias crep="cd ~/Documents/repos/re-pdx/recordexpungPDX"
+alias crepf="cd ~/Documents/repos/re-pdx/recordexpungPDX/src/frontend"
+alias crepb="cd ~/Documents/repos/re-pdx/recordexpungPDX/src/backend/expungeservice"
+
+# Remember to run:
+alias svenv="source env/bin/activate"
+alias revenv="source ~/Documents/repos/re-pdx/recordexpungPDX/env/bin/activate"
 
 alias cr="cd ~/Documents/repos"
 alias cn="cd $MC_HOME/mentorcollective-elm/mentor-collective"
@@ -71,8 +78,8 @@ alias f='find -type f'
 alias ll='ls -A1F'
 
 # The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
-alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
-alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
 
 # Find all files without spaces in their names.
 alias fs='find . -type f ! -iregex "\./.+ .+" -print'
@@ -409,6 +416,23 @@ function catchmail {
   google-chrome-stable http://127.0.0.1:1080
 }
 
+function rotate_all_pd {
+  for file in $(find -maxdepth 1 -type f -printf "%f\n")
+  do
+    convert "$file" -rotate 90 ../$file
+  done
+}
+alias rapd='rotate_all_pd'
+
+function rotate_all {
+  mkdir ./prerotated
+  for file in $(find -maxdepth 1 -type f -printf "%f\n")
+  do
+    mv $file ./prerotated/$file
+    convert "./prerotated/$file" -rotate 90 ./$file
+  done
+}
+
 function gssp {
   eval "git stash show -p stash@{$1}"
 }
@@ -496,9 +520,9 @@ function set_up_repo {
   array_form=(${1//\// })
   folder_name=${array_form[1]}
 
-  cd ~/repos
+  cd ~/Documents/repos
   mkdir $folder_name
-  cd ~/repos/$folder_name
+  cd ~/Documents/repos/$folder_name
 
   git clone 'git@github.com:'$1'.git'
   sublime_create_and_open_project $folder_name'/'
@@ -571,11 +595,22 @@ function dl_yt_audio {
       return
   fi
 
-  ffmpeg -i "audio.opus" "audio.flac"
+  # ffmpeg -i "audio.opus" "audio.flac"
   rm download.webm
   # rm audio.opus
 }
 
+function wtm {
+  ffmpeg -i $1 -qscale 0 $1.mp4
+}
+
+function ren {
+  rename -v 's/ /-/g' *
+  rename -v 's/_/-/g' *
+  rename -v 's/[0-9]//g' *
+  rename -v 's/[)(]//g' *
+  rename -v 's/\.(?=[^.]*\.)/-/g' *
+}
 
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
@@ -724,9 +759,11 @@ export PATH="$PATH:/usr/local/heroku/bin"
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
+# Also see functions sr and srcm above for search-and-replace tasks.
+#
 # If you need a newline in a string, you must use $'\n'.
 # rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
-alias rff='runhaskell ~/Documents/repos/hsutils/regex-remove-from-files.hs'
+alias rff='runhaskell ~/Documents/repos/hsutils/hsutils/regex-remove-from-files.hs'
 
 function crff {
   git commit -am "Remove lines matching $1"
