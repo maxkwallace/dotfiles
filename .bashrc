@@ -7,6 +7,18 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 # List total sizes of directories in current folder: du -sh -- *
 alias dush='du -sh -- *'
 
+# Renaming:
+# https://gist.github.com/premek/6e70446cfc913d3c929d7cdbfe896fef
+# foo.flac -> bar.flac
+# mv {foo,bar}.flac
+
+# Recursive:
+#
+# find . -print | while read filename; do
+#   touch -d '14 April 2020 11:00' "$filename"
+#   touch -d "$(date -R -r "$filename") - 2 hours" "$filename"
+# done
+
 # Find the biggest files in subdirectories.
 # find -type f -exec du -Sh {} + | sort -rh | head -n 5
 
@@ -19,8 +31,16 @@ alias dush='du -sh -- *'
 # mkdir flac
 # for i in *; do ffmpeg -i "$i" "flac/${i::-4}.flac"; done
 
+# Splitting FLAC with cue file
+# cuebreakpoints file.cue | shnsplit -o flac file.flac
+
 # Convert webp:
 # dwebp file.webp -o abc.png
+#
+# for file in $(ls)
+# do
+#   dwebp $file -o ${file:0:-5}.png
+# done
 
 # Unzip all zipfiles in subdirectories and delete the archives:
 # find . -depth -name '*.zip' -execdir /usr/bin/unzip -n {} \; -delete
@@ -63,6 +83,8 @@ alias crep="cd ~/Documents/repos/re-pdx/recordexpungPDX"
 alias crepf="cd ~/Documents/repos/re-pdx/recordexpungPDX/src/frontend"
 alias crepb="cd ~/Documents/repos/re-pdx/recordexpungPDX/src/backend/expungeservice"
 
+alias ccw="cd ~/Documents/repos/claire-website/claire-website-max-fork"
+
 # Remember to run:
 alias svenv="source env/bin/activate"
 alias revenv="source ~/Documents/repos/re-pdx/recordexpungPDX/env/bin/activate"
@@ -74,6 +96,9 @@ alias ctd="cd $MC_HOME/typeform_data"
 
 alias fn='find -type f -name'
 alias f='find -type f'
+
+# Find text files only.
+alias ftfo='find . -type f -exec grep -Iq . {} \; -print'
 
 alias ll='ls -A1F'
 
@@ -580,6 +605,7 @@ alias changed_relative_to_master='g diff --name-only master'
 alias crm='changed_relative_to_master'
 
 # Install youtube-dl (ffmpeg should already be installed)
+# sudo youtube-dl -U to update
 function dl_yt_audio {
   youtube-dl -f 'bestaudio' -o 'download.%(ext)s' $1
 
