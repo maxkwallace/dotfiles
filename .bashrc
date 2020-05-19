@@ -3,6 +3,21 @@ MC_HOME="$HOME/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
+# Test if a variable is empty:
+# if [ -z "$FOO" ]
+# then
+#   echo "FOO is empty"
+# else
+#   echo "FOO is not empty"
+# fi
+
+# String equality:
+# if [ "$str1" == "$str2" ]; then
+#     echo "Strings are equal"
+# else
+#     echo "Strings are not equal"
+# fi
+
 # Utility commands:
 # List total sizes of directories in current folder: du -sh -- *
 alias dush='du -sh -- *'
@@ -63,7 +78,87 @@ export GIT_EDITOR=vim
 # For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
 export PATH=~/.local/bin:$PATH
 
-alias python=python3
+# alias python=python3
+
+
+# New for Brio:
+BRIO_PARENT="$HOME/Documents/brio"
+BRIO_ROOT="$BRIO_PARENT/brio"
+BRIO_HOME="$BRIO_ROOT/covid"
+BRIO_LOG="/var/log/brio/brio.log"
+
+BRIO_LEARNING="$HOME/Documents/sandbox/brio-learning/learning"
+
+function sw {
+  source $BRIO_PARENT/venv/bin/activate
+  cd $BRIO_HOME
+}
+
+function sb {
+  source ~/.bashrc
+  sw
+}
+
+function sl {
+  source $BRIO_LEARNING/flask-from-scratch/myproject/venv/bin/activate
+  cd $BRIO_LEARNING
+}
+
+function pms {
+  cd $BRIO_HOME
+  python manage.py shell
+}
+
+alias pf='pip freeze | grep -v 'pkg-resources==0.0.0''
+
+function pis {
+  pushd $BRIO_ROOT
+  pip install $1
+  pf > requirements.txt
+  popd
+}
+
+function pfr {
+  pushd $BRIO_ROOT
+  pf > requirements.txt
+  popd
+}
+
+function dpc {
+  rm $(find -name *.pyc)
+}
+
+function drm {
+  docker rm -f $(docker ps -a -q)
+}
+
+function sshs {
+  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@staging-leech
+  # source /usr/src/venv/brio/bin/activate
+  # export ENV=LOCAL
+}
+
+function sshp {
+  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@app-arsenic
+}
+
+function sshlb {
+  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@lb-wormwood
+}
+
+function sshws {
+  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@warmspare-mummydust
+}
+
+alias py='python3'
+alias pt='pytest'
+alias ave='source ~/env/bin/activate'
+alias dcb='docker-compose up --build'
+alias dea='docker exec -it app /bin/bash'
+alias bps='psql brio -h localhost -U brio --port 5405'
+alias tl="tail -f $BRIO_LOG"
+# End Brio
+
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
@@ -86,8 +181,8 @@ alias crepb="cd ~/Documents/repos/re-pdx/recordexpungPDX/src/backend/expungeserv
 alias ccw="cd ~/Documents/repos/claire-website/claire-website-max-fork"
 
 # Remember to run:
-alias svenv="source env/bin/activate"
-alias revenv="source ~/Documents/repos/re-pdx/recordexpungPDX/env/bin/activate"
+# alias svenv="source env/bin/activate"
+# alias revenv="source ~/Documents/repos/re-pdx/recordexpungPDX/env/bin/activate"
 
 alias cr="cd ~/Documents/repos"
 alias cn="cd $MC_HOME/mentorcollective-elm/mentor-collective"
@@ -102,9 +197,13 @@ alias ftfo='find . -type f -exec grep -Iq . {} \; -print'
 
 alias ll='ls -A1F'
 
+# Old aliases used when at MC:
 # The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
-alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
-alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+# alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+# alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+
+# For Brio:
+alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock -o -name npm-debug.log -o -name dist -o -name package-lock.json -o -path ./static  -o -name __pycache__  -o -path ./not_garbage \) -prune -o -type f -print'
 
 # Find all files without spaces in their names.
 alias fs='find . -type f ! -iregex "\./.+ .+" -print'
@@ -127,10 +226,10 @@ alias gpni='grep -E'
 alias gpvni='grep -E -v'
 alias gpv='grep -E -v -i'
 
-alias sagi='sudo apt-get install'
-alias sagu='sudo apt-get update'
-alias sagug='sudo apt-get upgrade'
-alias sag='sudo apt-get'
+alias sagi='sudo apt install'
+alias sagu='sudo apt update'
+alias sagug='sudo apt upgrade'
+alias sag='sudo apt'
 
 alias cl='clear'
 alias spo='sudo poweroff'
@@ -179,6 +278,7 @@ alias gcm='git checkout master'
 alias gct='git commit'
 alias gcam='git commit -am'
 alias gca='git commit -a'
+alias gts='git stash'
 alias gsl='git stash list'
 alias gss='git stash save'
 alias gsa='git stash apply'
@@ -189,6 +289,7 @@ alias gf='git fetch'
 alias gfp='git fetch --prune'
 alias gph='git push'
 alias gpffo='git pull --ff-only'
+alias gmffo='git merge --ff-only'
 alias grm='git rebase master'
 alias grc='git rebase --continue'
 alias gra='git rebase --abort'
@@ -213,7 +314,8 @@ alias rcpts='rake copy_production_to_staging'
 
 alias eb='subl ~/.bashrc'
 alias ebp='subl ~/.bash_profile'
-alias sb='source ~/.bashrc'
+# alias sb='source ~/.bashrc'
+alias sbnv='source ~/.bashrc'
 alias sbp='source ~/.bash_profile'
 
 alias c1='cd ..'
@@ -250,7 +352,7 @@ alias ras='/usr/local/android-studio/bin/studio.sh &'
 alias lip='apt list --installed'
 
 # To remove a package:
-# sudo apt-get remove <application_name>
+# sudo apt remove <application_name>
 
 function nsv {
   npm show $1 version
@@ -280,6 +382,12 @@ function sglni {
 
 function gdcm {
   local branch=$(current_branch)
+
+  if [ "master" == $branch ];
+  then
+    echo 'Already on master'
+    return
+  fi
   git checkout master
   git branch -D $branch
 }
@@ -365,6 +473,10 @@ function sr {
   gpni -l "$1" $(fr) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
 }
 
+function srof {
+  echo "$3" | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
+}
+
 function srcrm {
   gpni -l "$1" $(crm) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
 }
@@ -395,6 +507,10 @@ function gpfr {
 
 function gpfrb {
   gp --color "$@" $(frb)
+}
+
+function gpnif {
+  gpni --color "$@" $(f)
 }
 
 function gpnifr {
@@ -470,8 +586,16 @@ function op {
   git status --short | awk '$1 ~ /^M|A|U/ {print $2}'
 }
 
+function dno {
+  git diff --name-only
+}
+
 function sop {
   subl $(op)
+}
+
+function sodno {
+  subl $(dno)
 }
 
 function current_branch {
@@ -538,6 +662,8 @@ function sublime_create_and_open_project {
 
 alias scpt='sublime_create_project'
 alias scopt='sublime_create_and_open_project'
+
+alias sur='set_up_repo'
 
 # Call like:
 # :~$ set_up_repo username/repo-name
@@ -637,6 +763,17 @@ function ren {
   rename -v 's/[)(]//g' *
   rename -v 's/\.(?=[^.]*\.)/-/g' *
 }
+
+
+# Drop all databases in Postgres:
+#
+# sudo -u postgres psql
+#
+# select 'drop database "'||datname||'";'
+# from pg_database
+# where datistemplate=false;
+#
+# psql -d postgres -f dd.sql
 
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
@@ -803,3 +940,5 @@ function crff {
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
