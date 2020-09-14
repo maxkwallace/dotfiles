@@ -147,66 +147,8 @@ export GIT_EDITOR=vim
 # For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
 export PATH=~/.local/bin:$PATH
 
-# alias python=python3
-
-
-# New for Brio:
-BRIO_PARENT="$HOME/Documents/brio"
-BRIO_ROOT="$BRIO_PARENT/brio"
-BRIO_HOME="$BRIO_ROOT/covid"
-BRIO_LOG="/var/log/brio/brio.log"
-
-BRIO_LEARNING="$HOME/Documents/sandbox/brio-learning/learning"
-
-function sw {
-  source $BRIO_PARENT/venv/bin/activate
-  cd $BRIO_HOME
-}
-
-function ss {
-  cd $BRIO_HOME
-  python3 app.py
-}
-
-function srqw {
-  source /home/mkw/Documents/rq-dashboard/rq-venv/bin/activate
-  cd /home/mkw/Documents/rq-dashboard/rq-dashboard
-}
-
-function sb {
-  source ~/.bashrc
-  sw
-}
-
-function sl {
-  source $BRIO_LEARNING/flask-from-scratch/myproject/venv/bin/activate
-  cd $BRIO_LEARNING
-}
-
-function pms {
-  sw
-  python manage.py shell
-}
-
-function pmdm {
-  sw
-  python manage.py db migrate -m "$1"
-}
 
 alias pf='pip freeze | grep -v 'pkg-resources==0.0.0''
-
-function pis {
-  pushd $BRIO_ROOT
-  pip install $1
-  pf > requirements.txt
-  popd
-}
-
-function pfr {
-  pushd $BRIO_ROOT
-  pf > requirements.txt
-  popd
-}
 
 function rpc {
   rm $(find -name *.pyc)
@@ -216,37 +158,8 @@ function drm {
   docker rm -f $(docker ps -a -q)
 }
 
-function sshs {
-  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@staging-leech
-}
-
-function sshp {
-  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@app-arsenic
-}
-
-function sshlb {
-  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@lb-wormwood
-}
-
-function sshws {
-  ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@warmspare-mummydust
-}
-
-function rcd {
-  sudo -u postgres dropdb brio
-  sudo -u postgres createdb brio
-  sw
-  python3 manage.py db upgrade
-}
-
 alias py='python3'
 alias pt='pytest'
-alias ave='source ~/env/bin/activate'
-alias dcb='docker-compose up --build'
-alias dea='docker exec -it app /bin/bash'
-alias bps='psql brio -h localhost -U brio --port 5405'
-alias tl="tail -f $BRIO_LOG"
-# End Brio
 
 
 function join { local IFS="$1"; shift; echo "$*"; }
@@ -292,7 +205,7 @@ alias ll='ls -A1F'
 # alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
 # alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
 
-# For Brio:
+# Updated for Brio:
 alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock -o -name npm-debug.log -o -name dist -o -name package-lock.json -o -path ./static  -o -name __pycache__  -o -path ./not_garbage \) -prune -o -type f -print'
 
 # Find all files without spaces in their names.
@@ -329,11 +242,11 @@ alias umf='git diff --name-only --diff-filter=U'
 # This will open a bunch of empty (new) files if I don't run it from the root
 # of the repo. TODO: fix this.
 # alias sumf='subl $(umf)'
-function sumf {
-  pushd $BRIO_ROOT
-  subl $(umf)
-  popd
-}
+# function sumf {
+#   pushd EDIT
+#   subl $(umf)
+#   popd
+# }
 
 alias vc='veracrypt'
 
