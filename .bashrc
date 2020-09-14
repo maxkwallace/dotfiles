@@ -1,14 +1,32 @@
 # MC_HOME is not exported, since no child process should need to access it.
-MC_HOME="$HOME/mc"
+MC_HOME="$HOME/Documents/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
-# Test if a variable is empty:
-# if [ -z "$FOO" ]
+# xmodmap -- recommendation from Ale for remapping keys.
+# function ffncd {
+#   find . -type f -name "$1"
+# }
+#
+# function gpf {
+#   grep -E "$2" $(ffncd $1)
+# }
+
+
+# Test if a variable is unset or a length-zero string:
+# if [ -z "$bar" ]
 # then
 #   echo "FOO is empty"
 # else
 #   echo "FOO is not empty"
+# fi
+
+# Test if a variable is set and has length > 1
+# if [ -n "$FOO" ]
+# then
+#   echo "FOO is not empty"
+# else
+#   echo "FOO is empty"
 # fi
 
 # String equality:
@@ -18,9 +36,54 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 #     echo "Strings are not equal"
 # fi
 
+# map:
+# my_command | while read l; do something_with "$l"; done
+# look into: https://github.com/soveran/map
+
+function rt {
+  cd ~/Documents/talon-linux-89-0.0.8.29-1351-g12bc13b/talon
+  sudo ./run.sh
+}
+
+function ct {
+  cd ~/.talon/user/knausj_talon
+}
+
+
+# Ecryption and decryption:
+alias enc='gpg --pinentry-mode loopback --symmetric'
+alias dec='gpg --pinentry-mode loopback --decrypt'
+#
+# Locally, --pinentry-mode loopback seems to use cmdline input instead of the
+# UI dialog.
+
+# Regex cheatsheet:
+# Totally portable (AFAIK):
+# \d - digits
+# \s - whitespace
+# \w - word
+#
+# https://www.gnu.org/software/grep/manual/grep.html#Character-Classes-and-
+# Bracket-Expressions
+# ‘\b - Match the empty string at the edge of a word.
+# ‘\B - Match the empty string provided it’s not at the edge of a word.
+# ‘\< - Match the empty string at the beginning of word.
+# ‘\> - Match the empty string at the end of word.
+# ‘\w - Match word constituent, it is a synonym for ‘[_[:alnum:]]’.
+# ‘\W - Match non-word constituent, it is a synonym for ‘[^_[:alnum:]]’.
+# ‘\s - Match whitespace, it is a synonym for ‘[[:space:]]’.
+# ‘\S - Match non-whitespace, it is a synonym for ‘[^[:space:]]’.
+
+
 # Utility commands:
 # List total sizes of directories in current folder: du -sh -- *
 alias dush='du -sh -- *'
+
+# Wordcount lines for each file in dirctory:
+# find . -maxdepth 1 -type f -exec wc -l {} \;
+
+# Making random strings:
+# (0..37).to_a.map { (('A'..'z').to_a + ('0'..'9').to_a).sample }.join
 
 # Renaming:
 # https://gist.github.com/premek/6e70446cfc913d3c929d7cdbfe896fef
@@ -57,6 +120,11 @@ alias dush='du -sh -- *'
 #   dwebp $file -o ${file:0:-5}.png
 # done
 
+function wtp {
+  input=$1
+  dwebp "$input" -o "${input%.*}.png"
+}
+
 # Unzip all zipfiles in subdirectories and delete the archives:
 # find . -depth -name '*.zip' -execdir /usr/bin/unzip -n {} \; -delete
 
@@ -65,6 +133,7 @@ alias dush='du -sh -- *'
 # https://github.com/xflux-gui/fluxgui/issues/27
 
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
+alias start_redis='sudo /etc/init.d/redis_6379 start'
 
 # Note to self-- single vs. double quotes:
 # - Single quotes perserve the literal value of each character in the quotes-- no interpolation.
@@ -94,6 +163,16 @@ function sw {
   cd $BRIO_HOME
 }
 
+function ss {
+  cd $BRIO_HOME
+  python3 app.py
+}
+
+function srqw {
+  source /home/mkw/Documents/rq-dashboard/rq-venv/bin/activate
+  cd /home/mkw/Documents/rq-dashboard/rq-dashboard
+}
+
 function sb {
   source ~/.bashrc
   sw
@@ -105,8 +184,13 @@ function sl {
 }
 
 function pms {
-  cd $BRIO_HOME
+  sw
   python manage.py shell
+}
+
+function pmdm {
+  sw
+  python manage.py db migrate -m "$1"
 }
 
 alias pf='pip freeze | grep -v 'pkg-resources==0.0.0''
@@ -124,7 +208,7 @@ function pfr {
   popd
 }
 
-function dpc {
+function rpc {
   rm $(find -name *.pyc)
 }
 
@@ -134,8 +218,6 @@ function drm {
 
 function sshs {
   ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@staging-leech
-  # source /usr/src/venv/brio/bin/activate
-  # export ENV=LOCAL
 }
 
 function sshp {
@@ -148,6 +230,13 @@ function sshlb {
 
 function sshws {
   ssh -i $BRIO_PARENT/creds/brio-key.ssh brio@warmspare-mummydust
+}
+
+function rcd {
+  sudo -u postgres dropdb brio
+  sudo -u postgres createdb brio
+  sw
+  python3 manage.py db upgrade
 }
 
 alias py='python3'
@@ -171,6 +260,7 @@ alias se='source'
 alias cs="cd $MC_HOME"
 alias cm="cd $MC_HOME"
 alias ce="cd $MC_EMBER_HOME"
+alias cmr="cd $MC_RAILS_HOME"
 alias cea="cd $MC_EMBER_HOME/app"
 alias cf="cd ~/sandbox/rails-sandbox/foo"
 
@@ -226,16 +316,24 @@ alias gpni='grep -E'
 alias gpvni='grep -E -v'
 alias gpv='grep -E -v -i'
 
-alias sagi='sudo apt install'
-alias sagu='sudo apt update'
-alias sagug='sudo apt upgrade'
-alias sag='sudo apt'
+alias sai='sudo apt install'
+alias sau='sudo apt update'
+alias saug='sudo apt upgrade'
+alias sa='sudo apt'
 
 alias cl='clear'
 alias spo='sudo poweroff'
 
 alias umf='git diff --name-only --diff-filter=U'
-alias sumf='subl $(umf)'
+
+# This will open a bunch of empty (new) files if I don't run it from the root
+# of the repo. TODO: fix this.
+# alias sumf='subl $(umf)'
+function sumf {
+  pushd $BRIO_ROOT
+  subl $(umf)
+  popd
+}
 
 alias vc='veracrypt'
 
@@ -251,6 +349,9 @@ alias glsm='git ls-files -m'
 alias rmrfdt='rm -rf dist/* tmp/*'
 
 source /usr/share/bash-completion/completions/git
+
+# Searching the commit history for when a line was deleted:
+# git log -c -S'missingtext' /path/to/file
 
 alias g='git'
 __git_complete g __git_main
@@ -274,9 +375,9 @@ alias gb='git branch'
 __git_complete gb _git_branch
 
 alias gs='git status'
-alias gcm='git checkout master'
+alias gcma='git checkout master'
+alias gcpr='git checkout production'
 alias gct='git commit'
-alias gcam='git commit -am'
 alias gca='git commit -a'
 alias gts='git stash'
 alias gsl='git stash list'
@@ -295,6 +396,23 @@ alias grc='git rebase --continue'
 alias gra='git rebase --abort'
 alias grs='git rebase --skip'
 alias gaa='git add -A'
+alias gcp='git cherry-pick'
+alias gcpc='git cherry-pick --continue'
+alias gcpa='git cherry-pick --abort'
+
+function gcm {
+  if [ -n "$1" ]
+  then
+    git commit -am "$1"
+  else
+    git commit -am "$(date)"
+  fi
+}
+
+# "git rebase remote"
+function grr {
+  git rebase "origin/$(current_branch)"
+}
 
 alias gco='git checkout --ours'
 
@@ -469,6 +587,7 @@ function c {
 # $2 - the replace string
 #
 # In sed, the -E flag (for Extended regex support) reverses the meaning of "(" and "\(".
+# -i is --in-place
 function sr {
   gpni -l "$1" $(fr) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
 }
@@ -504,6 +623,7 @@ function gpfs {
 function gpfr {
   gp --color "$@" $(fr)
 }
+alias gr='gpfr'
 
 function gpfrb {
   gp --color "$@" $(frb)
@@ -539,11 +659,11 @@ function rc {
   popd
 }
 
-function rt {
-  pushd $MC_RAILS_HOME
-  rake test
-  popd
-}
+# function rt {
+#   pushd $MC_RAILS_HOME
+#   rake test
+#   popd
+# }
 
 function rtns {
   pushd $MC_RAILS_HOME
@@ -753,7 +873,8 @@ function dl_yt_audio {
 }
 
 function wtm {
-  ffmpeg -i $1 -qscale 0 $1.mp4
+  input=$1
+  ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
 }
 
 function ren {
