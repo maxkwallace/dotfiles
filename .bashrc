@@ -945,8 +945,22 @@ fi
 # Update, 2019-01-02: use the Ubuntu brightness GUI.
 alias br='brightness'
 function brightness {
+  if [ $(hostname) = "mkw-p1gen2" ]; then
+    echo $1 | sudo tee /sys/class/backlight/intel_backlight/brightness
+  else
     sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
+  fi
 }
+
+alias rbr='read_brightness'
+function read_brightness {
+  if [ $(hostname) = "mkw-p1gen2" ]; then
+    cat /sys/class/backlight/intel_backlight/brightness
+  else
+    cat /sys/class/backlight/acpi_video0/brightness
+  fi
+}
+
 
 # I changed the heroku directory to be added to the end of the PATH rather than the beginning--
 # this was causing issues with RVM.
