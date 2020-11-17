@@ -3,7 +3,10 @@ MC_HOME="$HOME/Documents/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
-# xmodmap -- recommendation from Ale for remapping keys.
+# To edit keymappings on Ubuntu 20.04, visit /usr/share/X11/xkb/symbols/
+# and edit e.g. the pc file.
+alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
+
 # function ffncd {
 #   find . -type f -name "$1"
 # }
@@ -345,7 +348,7 @@ alias rcpts='rake copy_production_to_staging'
 
 alias eb='subl ~/.bashrc'
 alias ebp='subl ~/.bash_profile'
-# alias sb='source ~/.bashrc'
+alias sb='source ~/.bashrc'
 alias sbnv='source ~/.bashrc'
 alias sbp='source ~/.bash_profile'
 
@@ -989,4 +992,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+if [ $(hostname) = "mkw-p1gen2" ]; then
+  alias python=python3
+fi
 
