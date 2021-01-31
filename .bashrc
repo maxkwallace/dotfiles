@@ -126,6 +126,27 @@ alias dush='du -sh -- *'
 #   dwebp $file -o ${file:0:-5}.png
 # done
 
+# Remove intermediate directories (doesn't work?)
+# for dir in $(ls)
+# do
+#   cd $dir
+#   echo $(pwd)
+
+#   if [ "2" == $(find -type d | wc -l) ];
+#   then
+#     echo "moving and removing"
+#     cd $(find -type d | tail -1)
+#     mv * ../
+#     echo 'moved'
+#     cd ..
+#     echo 'removing '"$(find -type d | tail -1)"
+#     rmdir $(find -type d | tail -1)
+#   else
+#     echo 'Expected to find one subdir, not found, doing nothing'
+#   fi
+#   cd ..
+# done
+
 function wtp {
   input=$1
   dwebp "$input" -o "${input%.*}.png"
@@ -172,7 +193,7 @@ function join { local IFS="$1"; shift; echo "$*"; }
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
-alias cb='cd ~/Documents/repos/dotfiles/'
+alias cb='cd ~/Documents/my-repos/dotfiles/'
 alias se='source'
 
 # These aliases don't work on OSX without using double quotes.
@@ -183,20 +204,7 @@ alias cmr="cd $MC_RAILS_HOME"
 alias cea="cd $MC_EMBER_HOME/app"
 alias cf="cd ~/sandbox/rails-sandbox/foo"
 
-alias crep="cd ~/Documents/repos/re-pdx/recordexpungPDX"
-alias crepf="cd ~/Documents/repos/re-pdx/recordexpungPDX/src/frontend"
-alias crepb="cd ~/Documents/repos/re-pdx/recordexpungPDX/src/backend/expungeservice"
-
-alias ccw="cd ~/Documents/repos/claire-website/claire-website-max-fork"
-
-# Remember to run:
-# alias svenv="source env/bin/activate"
-# alias revenv="source ~/Documents/repos/re-pdx/recordexpungPDX/env/bin/activate"
-
 alias cr="cd ~/Documents/repos"
-alias cn="cd $MC_HOME/mentorcollective-elm/mentor-collective"
-alias cnw="cd $MC_HOME/mentorcollective-elm/mentor-collective/web/src"
-alias ctd="cd $MC_HOME/typeform_data"
 
 alias fn='find -type f -name'
 alias f='find -type f'
@@ -352,7 +360,6 @@ alias rcpts='rake copy_production_to_staging'
 alias eb='subl ~/.bashrc'
 alias ebp='subl ~/.bash_profile'
 alias sb='source ~/.bashrc'
-alias sbnv='source ~/.bashrc'
 alias sbp='source ~/.bash_profile'
 
 alias c1='cd ..'
@@ -980,7 +987,7 @@ export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 #
 # If you need a newline in a string, you must use $'\n'.
 # rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
-alias rff='runhaskell ~/Documents/repos/hsutils/hsutils/regex-remove-from-files.hs'
+alias rff='runhaskell ~/Documents/my-repos/hsutils/hsutils/regex-remove-from-files.hs'
 
 function crff {
   git commit -am "Remove lines matching $1"
@@ -999,3 +1006,5 @@ if [ $(hostname) = "mkw-p1gen2" ]; then
   alias python=python3
 fi
 
+# Via https://stackoverflow.com/a/53825858/1067145, to fix Hugo error
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libgtk3-nocsd.so.0
