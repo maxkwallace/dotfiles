@@ -7,6 +7,9 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 # and edit e.g. the pc file.
 alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
 
+# Remove EXIF data from an image:
+# mogrify -strip a.jpg
+
 # function ffncd {
 #   find . -type f -name "$1"
 # }
