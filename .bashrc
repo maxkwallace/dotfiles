@@ -121,7 +121,7 @@ alias dush='du -sh -- *'
 # Convert webp:
 # dwebp file.webp -o abc.png
 #
-# for file in $(ls)
+# for file in $(ls *.webp)
 # do
 #   dwebp $file -o ${file:0:-5}.png
 # done
@@ -800,7 +800,8 @@ function dl_yt_audio {
 
 function wtm {
   input=$1
-  ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
+  # ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
+  ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}.mp4"
 }
 
 function ren {
