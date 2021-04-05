@@ -1,3 +1,5 @@
+# May be useful to read https://github.com/anordal/shellharden/blob/master/how_to_do_things_safely_in_bash.md
+
 # MC_HOME is not exported, since no child process should need to access it.
 MC_HOME="$HOME/Documents/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
