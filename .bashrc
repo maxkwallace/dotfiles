@@ -105,7 +105,7 @@ alias dush='du -sh -- *'
 #   touch -d "$(date -R -r "$filename") - 2 hours" "$filename"
 # done
 
-# Find the biggest files in subdirectories.
+# Find the largest files in subdirectories.
 # find -type f -exec du -Sh {} + | sort -rh | head -n 5
 
 # Use the rename command to rename multiple files:
@@ -116,6 +116,59 @@ alias dush='du -sh -- *'
 # Convert to FLAC:
 # mkdir flac
 # for i in *; do ffmpeg -i "$i" "flac/${i::-4}.flac"; done
+
+# for i in *.wav; do echo "$i"; echo "${i::-4}.flac"; done
+# for i in *.wav; do ffmpeg -i "$i" "${i::-4}.flac"; done
+
+# Convert all flac files to ogg (and delete after conversion)
+# for i in *.flac;
+# do
+#   ffmpeg -i "$i" "${i::-5}.ogg"
+#   if [ ! -f "${i::-5}.ogg" ]; then
+#       echo "No ogg file"
+#       break
+#   fi
+#   rm "$i"
+# done
+
+# ffmpeg -i "$i" "${i::-4}.ogg"; done
+
+
+# 2022-02-25 Convert all 2nd subdirectories' flac files to ogg
+# i.e. in directory of artists, use to convert song files in album folders
+#
+# for f in *; do
+#     if [ -d "$f" ]; then
+#       echo $(pwd)/$f
+#       cd "$f"
+#       for g in *; do
+#           if [ -d "$g" ]; then
+#             echo $(pwd)/$g
+#             cd "$g"
+#             for i in *.flac;
+#             do
+#               pwdvar=$(pwd)
+#               tpwdvar=${pwdvar:0:40}
+#               if [ $tpwdvar != "/home/mkw/Dropbox/unsynced/music-on-phon" ]; then
+#                 echo "ERROR"
+#                 exit 1
+#               elif [ -f "$i" ]; then
+#                 echo $(pwd)/$i
+#                 ffmpeg -i "$i" -vsync 0 "${i::-5}.ogg"
+#                 if [ ! -f "${i::-5}.ogg" ]; then
+#                     echo "No ogg file"
+#                     break
+#                 fi
+#                 rm "$i"
+#               fi
+#             done
+#             cd ..
+#           fi
+#       done
+#       cd ..
+#     fi
+# done
+
 
 # Splitting FLAC with cue file
 # cuebreakpoints file.cue | shnsplit -o flac file.flac
@@ -173,8 +226,9 @@ export VISUAL=subl
 export EDITOR="$VISUAL"
 export GIT_EDITOR=vim
 
-# For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
-export PATH=~/.local/bin:$PATH
+# 2022-05-01 commented out the following, new rvm doesn't seem to like it?
+  # For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
+  # export PATH=~/.local/bin:$PATH
 
 
 alias pf='pip freeze | grep -v 'pkg-resources==0.0.0''
@@ -195,18 +249,14 @@ function join { local IFS="$1"; shift; echo "$*"; }
 
 alias csubl='c ~/.config/sublime-text-3/Packages/User/'
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
-alias cb='cd ~/Documents/my-repos/dotfiles/'
+alias cb='cd ~/Documents/repos/dotfiles/'
 alias se='source'
 
-# These aliases don't work on OSX without using double quotes.
-alias cs="cd $MC_HOME"
-alias cm="cd $MC_HOME"
-alias ce="cd $MC_EMBER_HOME"
-alias cmr="cd $MC_RAILS_HOME"
-alias cea="cd $MC_EMBER_HOME/app"
-alias cf="cd ~/sandbox/rails-sandbox/foo"
-
+# alias cs="cd $MC_HOME" doesn't work on OSX without using double quotes.
 alias cr="cd ~/Documents/repos"
+
+alias crr="cd ~/Documents/repos/rtr/rtr"
+alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
 
 alias fn='find -type f -name'
 alias f='find -type f'
@@ -581,11 +631,12 @@ function rbd {
   rubocop -D "$@"
 }
 
-function rc {
-  pushd $MC_RAILS_HOME
-  bin/rails console
-  popd
-}
+alias rc='rails c'
+# function rc {
+#   pushd $MC_RAILS_HOME
+#   bin/rails console
+#   popd
+# }
 
 # function rt {
 #   pushd $MC_RAILS_HOME
@@ -778,10 +829,8 @@ function to_mp3 {
 alias changed_relative_to_master='g diff --name-only master'
 alias crm='changed_relative_to_master'
 
-# Install youtube-dl (ffmpeg should already be installed)
-# sudo youtube-dl -U to update
 function dl_yt_audio {
-  youtube-dl -f 'bestaudio' -o 'download.%(ext)s' $1
+  yt-dlp -f 'bestaudio' -o 'download.%(ext)s' $1
 
   if [ ! -f download.webm ]; then
       echo "Didn't get a webm"
@@ -806,12 +855,56 @@ function wtm {
   ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}.mp4"
 }
 
+function compressv {
+  input=$1
+
+  ffmpeg -i $1 -vcodec libx265 -crf 24 "${input%.*}-1.mp4"
+  if [ -f "${input%.*}-1.mp4" ]; then
+      rm "$1"
+  else
+      echo "error: no output file"
+  fi
+}
+
+function halfframev {
+  input=$1
+
+  ffmpeg -i $1 -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 24 "${input%.*}-1.mp4"
+  if [ -f "${input%.*}-1.mp4" ]; then
+     rm "$1"
+  else
+     echo "error: no output file"
+  fi
+}
+
+
+function mtm {
+  input=$1
+  # ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
+  ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}-2.mp4"
+}
+
+# Mostly for papers in sources/
 function ren {
   rename -v 's/ /-/g' *
   rename -v 's/_/-/g' *
   rename -v 's/[0-9]//g' *
   rename -v 's/[)(]//g' *
   rename -v 's/\.(?=[^.]*\.)/-/g' *
+}
+
+# Fixing filenames for Windows
+function renw {
+  rename -v 's/
+/_/g' *
+  rename -v 's/\?/_/g' *
+  rename -v 's/:/_/g' *
+}
+
+# For music files
+function ren2 {
+  rename -v 's/ /-/g' *
+  rename -v 's/[)(]//g' *
 }
 
 
@@ -978,19 +1071,22 @@ function read_brightness {
 }
 
 
-# I changed the heroku directory to be added to the end of the PATH rather than the beginning--
-# this was causing issues with RVM.
+# 2022-05-01 commented out the following, new rvm doesn't seem to like it?
+  # I changed the heroku directory to be added to the end of the PATH rather than the beginning--
+  # this was causing issues with RVM.
 
-# Added by the Heroku Toolbelt:
-export PATH="$PATH:/usr/local/heroku/bin"
+  # Added by the Heroku Toolbelt:
+  # export PATH="$PATH:/usr/local/heroku/bin"
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+  # export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+
 
 # Also see functions sr and srcm above for search-and-replace tasks.
 #
 # If you need a newline in a string, you must use $'\n'.
 # rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
-alias rff='runhaskell ~/Documents/my-repos/hsutils/hsutils/regex-remove-from-files.hs'
+alias rff='runhaskell ~/Documents/repos/hsutils/hsutils/regex-remove-from-files.hs'
 
 function crff {
   git commit -am "Remove lines matching $1"
