@@ -10,15 +10,15 @@ I recommend creating a symlink for your `.bashrc` so you don't have to deal with
 
 ```
 cd ~
-ln -s Documents/my-repos/dotfiles/.bashrc .bashrc
-ln -s Documents/my-repos/dotfiles/.bash_profile .bash_profile
+ln -s Documents/repos/dotfiles/.bashrc .bashrc
+ln -s Documents/repos/dotfiles/.bash_profile .bash_profile
 ```
 
 ```
 you@somewhere:~$ ls -la
 total ...
 ...
-lrwxrwxrwx  1 mkw  mkw    38 Nov 27 08:30 .bash_profile -> Documents/my-repos/dotfiles/.bash_profile
-lrwxrwxrwx  1 mkw  mkw    32 Nov 27 08:28 .bashrc -> Documents/my-repos/dotfiles/.bashrc
+lrwxrwxrwx  1 mkw  mkw    38 Nov 27 08:30 .bash_profile -> Documents/repos/dotfiles/.bash_profile
+lrwxrwxrwx  1 mkw  mkw    32 Nov 27 08:28 .bashrc -> Documents/repos/dotfiles/.bashrc
 ...
 ```
