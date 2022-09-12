@@ -49,8 +49,8 @@ alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
 # look into: https://github.com/soveran/map
 
 function rt {
-  cd ~/Documents/talon-linux-89-0.0.8.29-1351-g12bc13b/talon
-  sudo ./run.sh
+  cd ~/Documents/talon-linux-114-0.3.1/talon
+  ./run.sh
 }
 
 function ct {
@@ -1054,7 +1054,7 @@ fi
 # Update, 2019-01-02: use the Ubuntu brightness GUI.
 alias br='brightness'
 function brightness {
-  if [ $(hostname) = "mkw-p1gen2" ]; then
+  if [ $(hostname) = "mjw-p1gen2" ]; then
     echo $1 | sudo tee /sys/class/backlight/intel_backlight/brightness
   else
     sudo su -c "echo $1 > /sys/class/backlight/acpi_video0/brightness"
@@ -1063,7 +1063,7 @@ function brightness {
 
 alias rbr='read_brightness'
 function read_brightness {
-  if [ $(hostname) = "mkw-p1gen2" ]; then
+  if [ $(hostname) = "mjw-p1gen2" ]; then
     cat /sys/class/backlight/intel_backlight/brightness
   else
     cat /sys/class/backlight/acpi_video0/brightness
@@ -1106,4 +1106,6 @@ if [ $(hostname) = "mkw-p1gen2" ]; then
 fi
 
 # Via https://stackoverflow.com/a/53825858/1067145, to fix Hugo error
-export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libgtk3-nocsd.so.0
+# export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libgtk3-nocsd.so.0
+
+[ -f "/home/mjw/.ghcup/env" ] && source "/home/mjw/.ghcup/env" # ghcup-env
