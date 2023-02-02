@@ -9,6 +9,17 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 # and edit e.g. the pc file.
 alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
 
+
+function back_up_talon {
+  cd "/home/mjw/Dropbox/everything-else/talon-backup"
+  FOLDERNAME=$(date "+%Y-%m-%d-%H-%M")
+  mkdir $FOLDERNAME
+  cd $FOLDERNAME
+  cp -r ~/.talon/user/* .
+  rm -rf cursorless-talon/ knausj_talon/ rango-talon/
+}
+
+
 # Remove EXIF data from an image:
 # mogrify -strip a.jpg
 
@@ -55,6 +66,10 @@ function rt {
 
 function ct {
   cd ~/.talon/user/knausj_talon
+}
+
+function ctp {
+  cd ~/Documents/talon-linux-114-0.3.1/talon/resources/python/lib/python3.9/site-packages/talon
 }
 
 
@@ -121,53 +136,104 @@ alias dush='du -sh -- *'
 # for i in *.wav; do ffmpeg -i "$i" "${i::-4}.flac"; done
 
 # Convert all flac files to ogg (and delete after conversion)
-# for i in *.flac;
-# do
-#   ffmpeg -i "$i" "${i::-5}.ogg"
-#   if [ ! -f "${i::-5}.ogg" ]; then
-#       echo "No ogg file"
-#       break
-#   fi
-#   rm "$i"
-# done
+function flac_to_ogg {
+  for i in *.flac;
+  do
+    ffmpeg -i "$i" "${i::-5}.ogg"
+    if [ ! -f "${i::-5}.ogg" ]; then
+        echo "No ogg file"
+        break
+    fi
+    rm "$i"
+  done
+}
 
-# ffmpeg -i "$i" "${i::-4}.ogg"; done
+function wav_to_flac {
+  for i in *.wav;
+  do
+    ffmpeg -i "$i" "${i::-5}.flac"
+    if [ ! -f "${i::-5}.flac" ]; then
+        echo "No ogg file"
+        break
+    fi
+    rm "$i"
+  done
+}
 
+function wav_to_16 {
+  for i in *.wav;
+  do
+    ffmpeg -i "$i" -ar 44100 "${i::-4}-16.wav"
+    if [ ! -f "${i::-4}-16.wav" ]; then
+        echo "No output file"
+        break
+    fi
+    rm "$i"
+  done
+}
+
+function flac_to_ogg_subdir_1 {
+  for g in *; do
+      if [ -d "$g" ]; then
+        echo $(pwd)/$g
+        cd "$g"
+        for i in *.flac;
+        do
+          pwdvar=$(pwd)
+          tpwdvar=${pwdvar:0:40}
+          if [ $tpwdvar != "/home/mjw/Dropbox/unsynced/music-on-phon" ]; then
+            echo "ERROR"
+            exit 1
+          elif [ -f "$i" ]; then
+            echo $(pwd)/$i
+            ffmpeg -i "$i" -vsync 0 "${i::-5}.ogg"
+            if [ ! -f "${i::-5}.ogg" ]; then
+                echo "No ogg file"
+                break
+            fi
+            rm "$i"
+          fi
+        done
+        cd ..
+      fi
+  done
+}
 
 # 2022-02-25 Convert all 2nd subdirectories' flac files to ogg
 # i.e. in directory of artists, use to convert song files in album folders
-#
-# for f in *; do
-#     if [ -d "$f" ]; then
-#       echo $(pwd)/$f
-#       cd "$f"
-#       for g in *; do
-#           if [ -d "$g" ]; then
-#             echo $(pwd)/$g
-#             cd "$g"
-#             for i in *.flac;
-#             do
-#               pwdvar=$(pwd)
-#               tpwdvar=${pwdvar:0:40}
-#               if [ $tpwdvar != "/home/mkw/Dropbox/unsynced/music-on-phon" ]; then
-#                 echo "ERROR"
-#                 exit 1
-#               elif [ -f "$i" ]; then
-#                 echo $(pwd)/$i
-#                 ffmpeg -i "$i" -vsync 0 "${i::-5}.ogg"
-#                 if [ ! -f "${i::-5}.ogg" ]; then
-#                     echo "No ogg file"
-#                     break
-#                 fi
-#                 rm "$i"
-#               fi
-#             done
-#             cd ..
-#           fi
-#       done
-#       cd ..
-#     fi
-# done
+function flac_to_ogg_subdir_2 {
+  for f in *; do
+      if [ -d "$f" ]; then
+        echo $(pwd)/$f
+        cd "$f"
+        for g in *; do
+            if [ -d "$g" ]; then
+              echo $(pwd)/$g
+              cd "$g"
+              for i in *.flac;
+              do
+                pwdvar=$(pwd)
+                tpwdvar=${pwdvar:0:40}
+                if [ $tpwdvar != "/home/mjw/Dropbox/unsynced/music-on-phon" ]; then
+                  echo "ERROR"
+                  exit 1
+                elif [ -f "$i" ]; then
+                  echo $(pwd)/$i
+                  ffmpeg -i "$i" -vsync 0 "${i::-5}.ogg"
+                  if [ ! -f "${i::-5}.ogg" ]; then
+                      echo "No ogg file"
+                      break
+                  fi
+                  rm "$i"
+                fi
+              done
+              cd ..
+            fi
+        done
+        cd ..
+      fi
+  done
+}
 
 
 # Splitting FLAC with cue file
@@ -254,8 +320,10 @@ alias se='source'
 
 # alias cs="cd $MC_HOME" doesn't work on OSX without using double quotes.
 alias cr="cd ~/Documents/repos"
+alias crhl="cd ~/Documents/repos/haskell-learning"
 
 alias crr="cd ~/Documents/repos/rtr/rtr"
+alias crj="cd ~/Documents/repos/rtr/fe"
 alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
 
 alias fn='find -type f -name'
@@ -354,7 +422,7 @@ alias gb='git branch'
 __git_complete gb _git_branch
 
 alias gs='git status'
-alias gcma='git checkout master'
+alias gcma='git checkout main'
 alias gcpr='git checkout production'
 alias gct='git commit'
 alias gca='git commit -a'
@@ -370,7 +438,7 @@ alias gfp='git fetch --prune'
 alias gph='git push'
 alias gpffo='git pull --ff-only'
 alias gmffo='git merge --ff-only'
-alias grm='git rebase master'
+alias grm='git rebase main'
 alias grc='git rebase --continue'
 alias gra='git rebase --abort'
 alias grs='git rebase --skip'
@@ -400,6 +468,7 @@ alias ggpa='git rev-list --all | xargs git grep'
 alias lola='git log --graph --decorate --pretty=oneline --abbrev-commit --all'
 
 alias s='subl'
+alias v='code'
 
 alias rdm='rake db:migrate'
 
@@ -479,12 +548,12 @@ function sglni {
 function gdcm {
   local branch=$(current_branch)
 
-  if [ "master" == $branch ];
+  if [ "main" == $branch ];
   then
-    echo 'Already on master'
+    echo 'Already on main'
     return
   fi
-  git checkout master
+  git checkout main
   git branch -D $branch
 }
 
@@ -545,15 +614,15 @@ function rrfp {
   popd
 }
 
-# In the current feature branch-- how many commits do we have that aren't in master?
-function commits_ahead_of_master {
-  git rev-list $(current_branch) --not master | wc -l
+# In the current feature branch-- how many commits do we have that aren't in main?
+function commits_ahead_of_main {
+  git rev-list $(current_branch) --not main | wc -l
 }
 
 # Rebase feature branch.
-alias rfb='git rebase -i HEAD~$(commits_ahead_of_master)'
+alias rfb='git rebase -i HEAD~$(commits_ahead_of_main)'
 
-alias cam='commits_ahead_of_master'
+alias cam='commits_ahead_of_main'
 
 function c {
   cd $1
@@ -616,11 +685,11 @@ function gpnifr {
 }
 
 function rbc {
-  rubocop -D -a $(changed_relative_to_master | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+  rubocop -D -a $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
 }
 
 function rbcna {
-  rubocop -D $(changed_relative_to_master | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+  rubocop -D $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
 }
 
 function rbca {
@@ -711,9 +780,9 @@ function rcs {
 }
 
 function delete_merged_branches {
-  if [ "master" != $(current_branch) ];
+  if [ "main" != $(current_branch) ];
   then
-    echo 'The current branch is not master!'
+    echo 'The current branch is not main!'
     return
   fi
   # To delete local branches that have been merged, run:
@@ -721,9 +790,9 @@ function delete_merged_branches {
 }
 
 function delete_elis_branches {
-  if [ "master" != $(current_branch) ];
+  if [ "main" != $(current_branch) ];
   then
-    echo 'The current branch is not master!'
+    echo 'The current branch is not main!'
     return
   fi
   git branch | grep '^  eli-' | xargs -n 1 git branch -D
@@ -826,8 +895,8 @@ function to_mp3 {
   avconv -i "$input" -qscale:a 0 "${input%.*}.mp3"
 }
 
-alias changed_relative_to_master='g diff --name-only master'
-alias crm='changed_relative_to_master'
+alias changed_relative_to_main='g diff --name-only main'
+alias crm='changed_relative_to_main'
 
 function dl_yt_audio {
   yt-dlp -f 'bestaudio' -o 'download.%(ext)s' $1
@@ -1020,8 +1089,9 @@ fi
 
 # some more ls aliases
 alias ll='ls -alF'
+alias l='ls -alF'
 alias la='ls -A'
-alias l='ls -CF'
+# alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
