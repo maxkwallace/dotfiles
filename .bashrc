@@ -153,6 +153,18 @@ function wav_to_flac {
   do
     ffmpeg -i "$i" "${i::-5}.flac"
     if [ ! -f "${i::-5}.flac" ]; then
+        echo "No flac file"
+        break
+    fi
+    rm "$i"
+  done
+}
+
+function wav_to_ogg {
+  for i in *.wav;
+  do
+    ffmpeg -i "$i" "${i::-5}.ogg"
+    if [ ! -f "${i::-5}.ogg" ]; then
         echo "No ogg file"
         break
     fi
@@ -368,6 +380,8 @@ alias sau='sudo apt update'
 alias saug='sudo apt upgrade'
 alias sa='sudo apt'
 
+alias sdi='sudo dpkg -i'
+
 alias cl='clear'
 alias spo='sudo poweroff'
 
@@ -468,7 +482,7 @@ alias ggpa='git rev-list --all | xargs git grep'
 alias lola='git log --graph --decorate --pretty=oneline --abbrev-commit --all'
 
 alias s='subl'
-alias v='code'
+alias v='code-insiders'
 
 alias rdm='rake db:migrate'
 
