@@ -120,13 +120,25 @@ alias dush='du -sh -- *'
 #   touch -d "$(date -R -r "$filename") - 2 hours" "$filename"
 # done
 
-# Find the largest files in subdirectories.
-# find -type f -exec du -Sh {} + | sort -rh | head -n 5
 
 # Use the rename command to rename multiple files:
 # rename 's/ /-/g' *
 
 # ls -a | sort -> to get a row-by-row list of names only
+
+
+
+function find_largest_files {
+  find -type f -exec du -Sh {} + | sort -rh | head -n ${1-5}
+}
+alias flf='find_largest_files'
+
+function find_largest_files_delete {
+  find_largest_files ${1-1} | cut -d$'\t' -f 2- | xargs -d'\n' rm -v
+}
+alias flfd='find_largest_files_delete'
+
+
 
 # Convert to FLAC:
 # mkdir flac
