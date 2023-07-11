@@ -1067,8 +1067,8 @@ if [ "$color_prompt" = yes ]; then
   #
   # Note to self: I tried customizing this to add the current working git branch (__git_ps1), but
   # that seemed to make the terminal too slow for my liking.
-  if [ $(hostname) = "mkw-M4800" ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@M4600\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+  if [ $(hostname) = "mxw-z490-e" ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@z490\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
   else
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
   fi
