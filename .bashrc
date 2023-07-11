@@ -19,6 +19,8 @@ function back_up_talon {
   rm -rf cursorless-talon/ knausj_talon/ rango-talon/
 }
 
+# Check motherboard, CPU, GPU temp readings
+# sensors
 
 # Remove EXIF data from an image:
 # mogrify -strip a.jpg
