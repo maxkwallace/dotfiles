@@ -5,10 +5,13 @@ MC_HOME="$HOME/Documents/mc"
 MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
 MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
+
+alias cdl='cd ~/Downloads'
+
+
 # To edit keymappings on Ubuntu 20.04, visit /usr/share/X11/xkb/symbols/
 # and edit e.g. the pc file.
 alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
-
 
 function back_up_talon {
   cd "/home/mjw/Dropbox/everything-else/talon-backup"
@@ -333,13 +336,21 @@ function drm {
   docker rm -f $(docker ps -a -q)
 }
 
+
 alias py='python3'
 alias pt='pytest'
 
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
-alias csubl='c ~/.config/sublime-text-3/Packages/User/'
+function csubl {
+  if [ $(hostname) = "mxw-z490-e" ]; then
+    c ~/.config/sublime-text/Packages/User/
+  else
+    c ~/.config/sublime-text-3/Packages/User/
+  fi
+}
+
 alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/Documents/repos/dotfiles/'
 alias se='source'
