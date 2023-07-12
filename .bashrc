@@ -67,7 +67,7 @@ function rt {
 }
 
 function ct {
-  cd ~/.talon/user/knausj_talon
+  cd ~/.talon/user/mxw-talon
 }
 
 function ctp {
