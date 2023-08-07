@@ -379,12 +379,14 @@ alias ll='ls -A1F'
 # Updated for Brio:
 alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock -o -name npm-debug.log -o -name dist -o -name package-lock.json -o -path ./static  -o -name __pycache__  -o -path ./not_garbage \) -prune -o -type f -print'
 
+
 # Find all files without spaces in their names.
 alias fs='find . -type f ! -iregex "\./.+ .+" -print'
 
 # Includes the test from fs to filter out filenames containing spaces.
 alias frs='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f ! -iregex "\./.+ .+" -print'
 
+alias fjr='find .  \( -path ./ia-writer \) -prune -o -type f -print'
 # 2019-05-10 hacking on find commands.
 # find . ! -iregex '.*/[\.a-z0-9-]*'
 # "!" negates the following test, regexes match the whole file path.
@@ -459,6 +461,14 @@ __git_complete ga _git_add
 
 alias gb='git branch'
 __git_complete gb _git_branch
+
+
+function gdce {
+  git diff --cached -- . ':(exclude)'$1
+}
+
+alias gdcep="git diff --cached -- . ':(exclude)package-lock.json'"
+
 
 alias gs='git status'
 alias gcma='git checkout main'
@@ -708,6 +718,9 @@ function gpfs {
 
 function gpfr {
   gp --color "$@" $(fr)
+}
+function gpfj {
+  gp --color "$@" $(fjr)
 }
 alias gr='gpfr'
 
