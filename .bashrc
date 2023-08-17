@@ -35,11 +35,21 @@
 # my_command | while read l; do something_with "$l"; done
 # look into: https://github.com/soveran/map
 
+function join { local IFS="$1"; shift; echo "$*"; }
+
+alias cl='clear'
+
+alias cb='cd ~/Documents/repos/dotfiles/'
+alias se='source'
+
+alias eb='subl ~/.bashrc'
+alias ebp='subl ~/.bash_profile'
+alias sb='source ~/.bashrc'
+alias sbp='source ~/.bash_profile'
 
 
 
-
-
+### ~~ CHEATSHEETS & NOTES FOR OTHER LANGUAGES ~~ ###
 
 # Regex cheatsheet:
 # Totally portable (AFAIK):
@@ -59,6 +69,8 @@
 # ‘\S - Match non-whitespace, it is a synonym for ‘[^[:space:]]’.
 
 
+# Making random strings in Ruby:
+# (0..37).to_a.map { (('A'..'z').to_a + ('0'..'9').to_a).sample }.join
 
 
 
@@ -67,14 +79,65 @@
 
 
 
-# Check motherboard, CPU, GPU temp readings:
-# sensors
+### ~~ EDITORS ~~ ###
 
-# To edit keymappings on Ubuntu 20.04, visit /usr/share/X11/xkb/symbols/
-# and edit e.g. the pc file.
-alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
+export VISUAL=subl
+export EDITOR="$VISUAL"
+export GIT_EDITOR=vim
+
+alias s='subl'
+alias v='code-insiders'
+
+function csubl {
+  if [ $(hostname) = "mxw-z490-e" ]; then
+    c ~/.config/sublime-text/Packages/User/
+  else
+    c ~/.config/sublime-text-3/Packages/User/
+  fi
+}
+
+alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 
 
+function sgl {
+  subl $(gpfr -l "$@")
+}
+
+function sglni {
+  subl $(gpnifr -l "$@")
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ NAVIGATION ~~ ###
+
+function c {
+  cd $1
+  ls
+}
+
+alias c1='cd ..'
+alias c2='cd ../..'
+alias c3='cd ../../..'
+alias c4='cd ../../../..'
+alias c5='cd ../../../..'
+alias c6='cd ../../../../..'
+
+alias cdl='cd ~/Downloads'
+
+alias cr="cd ~/Documents/repos"
+alias crhl="cd ~/Documents/repos/haskell-learning"
 
 
 
@@ -91,13 +154,59 @@ alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
 ### ~~ FILES & DIRECTORIES ~~ ###
 
 
+
+
+alias fn='find -type f -name'
+alias f='find -type f'
+
+# Find text files only.
+alias ftfo='find . -type f -exec grep -Iq . {} \; -print'
+
+alias ll='ls -A1F'
+
+
+
+# Old aliases used when at MC:
+# The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
+# alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+# alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
+
+# Updated for Brio:
+alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock -o -name npm-debug.log -o -name dist -o -name package-lock.json -o -path ./static  -o -name __pycache__  -o -path ./not_garbage \) -prune -o -type f -print'
+
+
+# Find all files without spaces in their names.
+alias fs='find . -type f ! -iregex "\./.+ .+" -print'
+
+# Includes the test from fs to filter out filenames containing spaces.
+alias frs='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f ! -iregex "\./.+ .+" -print'
+
+alias fjr='find .  \( -path ./ia-writer \) -prune -o -type f -print'
+# 2019-05-10 hacking on find commands.
+# find . ! -iregex '.*/[\.a-z0-9-]*'
+# "!" negates the following test, regexes match the whole file path.
+#
+# find everything:
+# find . -iregex '\./.+'
+#
+# find everything that doesn't contain a space:
+# find . ! -iregex '\./.+ .+'
+
+
+
+# Unzip all zipfiles in subdirectories and delete the archives:
+# find . -depth -name '*.zip' -execdir /usr/bin/unzip -n {} \; -delete
+
+
 # Wordcount lines for each file in dirctory:
 # find . -maxdepth 1 -type f -exec wc -l {} \;
+
 
 # Renaming:
 # https://gist.github.com/premek/6e70446cfc913d3c929d7cdbfe896fef
 # foo.flac -> bar.flac
 # mv {foo,bar}.flac
+
 
 # Recursive:
 #
@@ -106,6 +215,9 @@ alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
 #   touch -d "$(date -R -r "$filename") - 2 hours" "$filename"
 # done
 
+# function ffncd {
+#   find . -type f -name "$1"
+# }
 
 # Use the rename command to rename multiple files:
 # rename 's/ /-/g' *
@@ -113,66 +225,29 @@ alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
 # ls -a | sort -> to get a row-by-row list of names only
 
 
+# Remove intermediate directories (doesn't work?)
+# for dir in $(ls)
+# do
+#   cd $dir
+#   echo $(pwd)
+
+#   if [ "2" == $(find -type d | wc -l) ];
+#   then
+#     echo "moving and removing"
+#     cd $(find -type d | tail -1)
+#     mv * ../
+#     echo 'moved'
+#     cd ..
+#     echo 'removing '"$(find -type d | tail -1)"
+#     rmdir $(find -type d | tail -1)
+#   else
+#     echo 'Expected to find one subdir, not found, doing nothing'
+#   fi
+#   cd ..
+# done
 
 
 
-
-
-
-
-
-
-
-function back_up_talon {
-  cd "/home/mjw/Dropbox/everything-else/talon-backup"
-  FOLDERNAME=$(date "+%Y-%m-%d-%H-%M")
-  mkdir $FOLDERNAME
-  cd $FOLDERNAME
-  cp -r ~/.talon/user/* .
-  rm -rf cursorless-talon/ knausj_talon/ rango-talon/
-}
-
-function rt {
-  cd ~/Documents/talon-linux-114-0.3.1/talon
-  ./run.sh
-}
-
-function ct {
-  cd ~/.talon/user/mxw-talon
-}
-
-function ctp {
-  cd ~/Documents/talon-linux-114-0.3.1/talon/resources/python/lib/python3.9/site-packages/talon
-}
-
-
-
-# function ffncd {
-#   find . -type f -name "$1"
-# }
-#
-# function gpf {
-#   grep -E "$2" $(ffncd $1)
-# }
-
-
-alias cdl='cd ~/Downloads'
-
-
-
-# Ecryption and decryption:
-alias enc='gpg --pinentry-mode loopback --symmetric'
-alias dec='gpg --pinentry-mode loopback --decrypt'
-#
-# Locally, --pinentry-mode loopback seems to use cmdline input instead of the
-# UI dialog.
-
-
-# Making random strings in Ruby:
-# (0..37).to_a.map { (('A'..'z').to_a + ('0'..'9').to_a).sample }.join
-
-
-# Utility commands:
 # List total sizes of directories in current folder: du -sh -- *
 alias dush='du -sh -- *'
 
@@ -189,6 +264,160 @@ function find_largest_files_delete {
   find_largest_files ${1:-1} | cut -d$'\t' -f 2- | xargs -d'\n' rm -v
 }
 alias flfd='find_largest_files_delete'
+
+
+# "find" backwards-- find a file upwards in the tree
+#
+# All credit to http://stackoverflow.com/a/24642735/1067145
+function dnif {
+  # Recursively list a file from PWD up the directory tree to root
+  [[ -n $1 ]] || { echo "dnif [ls-opts] name"; return 1; }
+  local THERE=$PWD RC=2
+  while [[ $THERE != / ]]
+      do [[ -e $THERE/${2:-$1} ]] && { ls ${2:+$1} $THERE/${2:-$1}; RC=0; }
+          THERE=$(dirname $THERE)
+      done
+  [[ -e $THERE/${2:-$1} ]] && { ls ${2:+$1} /${2:-$1}; RC=0; }
+  return $RC
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ GREP ~~ ###
+
+
+alias gp='grep -E -i'
+alias gpni='grep -E'
+alias gpvni='grep -E -v'
+alias gpv='grep -E -v -i'
+
+# function gpf {
+#   grep -E "$2" $(ffncd $1)
+# }
+
+# -n
+function srn {
+  gpni -l $1 $(fr)
+}
+
+function gpf {
+  gp --color "$@" $(f)
+}
+
+function gpfs {
+  gp --color "$@" $(fs)
+}
+
+function gpfr {
+  gp --color "$@" $(fr)
+}
+function gpfj {
+  cd ~/Dropbox/personal/journals
+  gp --color "$@" $(fjr)
+}
+alias gr='gpfr'
+
+function gpfrb {
+  gp --color "$@" $(frb)
+}
+
+function gpnif {
+  gpni --color "$@" $(f)
+}
+
+function gpnifr {
+  gpni --color "$@" $(fr)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ SEARCH & REPLACE ~~ ###
+
+# Can be used to rename, e.g. methods.
+# $1 - the search pattern
+# $2 - the replace string
+#
+# In sed, the -E flag (for Extended regex support) reverses the meaning of "(" and "\(".
+# -i is --in-place
+function sr {
+  gpni -l "$1" $(fr) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
+}
+
+function srof {
+  echo "$3" | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
+}
+
+function srcrm {
+  gpni -l "$1" $(crm) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
+}
+
+# This function is commented out until I have a chance to finish it.
+# function srf {
+  # fr | gpni $1 | xargs -I filepath
+  # gpni -l $1 $(fr) | xargs -I filename echo
+# }
+
+
+
+
+
+
+
+
+### ~~ TALON ~~ ###
+
+function rt {
+  cd ~/Documents/talon-linux-114-0.3.1/talon
+  ./run.sh
+}
+
+function ct {
+  cd ~/.talon/user/mxw-talon
+}
+
+function ctp {
+  cd ~/Documents/talon-linux-114-0.3.1/talon/resources/python/lib/python3.9/site-packages/talon
+}
+
+function back_up_talon {
+  cd "/home/mjw/Dropbox/everything-else/talon-backup"
+  FOLDERNAME=$(date "+%Y-%m-%d-%H-%M")
+  mkdir $FOLDERNAME
+  cd $FOLDERNAME
+  cp -r ~/.talon/user/* .
+  rm -rf cursorless-talon/ knausj_talon/ rango-talon/
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -319,26 +548,27 @@ function flac_to_ogg_subdir_2 {
 # cuebreakpoints file.cue | shnsplit -o flac file.flac
 
 
-# Remove intermediate directories (doesn't work?)
-# for dir in $(ls)
-# do
-#   cd $dir
-#   echo $(pwd)
 
-#   if [ "2" == $(find -type d | wc -l) ];
-#   then
-#     echo "moving and removing"
-#     cd $(find -type d | tail -1)
-#     mv * ../
-#     echo 'moved'
-#     cd ..
-#     echo 'removing '"$(find -type d | tail -1)"
-#     rmdir $(find -type d | tail -1)
-#   else
-#     echo 'Expected to find one subdir, not found, doing nothing'
-#   fi
-#   cd ..
-# done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -359,110 +589,144 @@ function wtp {
 # Remove EXIF data from an image:
 # mogrify -strip a.jpg
 
-
-# Unzip all zipfiles in subdirectories and delete the archives:
-# find . -depth -name '*.zip' -execdir /usr/bin/unzip -n {} \; -delete
-
-
-
-# export SET_IN_REDIS_IN_DEVELOPMENT='true'
-alias start_redis='sudo /etc/init.d/redis_6379 start'
-
-
-export VISUAL=subl
-export EDITOR="$VISUAL"
-export GIT_EDITOR=vim
-
-
-# 2022-05-01 commented out the following, new rvm doesn't seem to like it?
-#
-# For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
-# export PATH=~/.local/bin:$PATH
-
-
-alias pf='pip freeze | grep -v 'pkg-resources==0.0.0''
-
-function rpc {
-  rm $(find -name *.pyc)
+# "present directory"
+function rotate_all_pd {
+  for file in $(find -maxdepth 1 -type f -printf "%f\n")
+  do
+    convert "$file" -rotate 90 ../$file
+  done
 }
+alias rapd='rotate_all_pd'
 
-function drm {
-  docker rm -f $(docker ps -a -q)
+function rotate_all {
+  mkdir ./prerotated
+  for file in $(find -maxdepth 1 -type f -printf "%f\n")
+  do
+    mv $file ./prerotated/$file
+    convert "./prerotated/$file" -rotate 90 ./$file
+  done
 }
 
 
-alias py='python3'
-alias pt='pytest'
 
 
-function join { local IFS="$1"; shift; echo "$*"; }
-
-function csubl {
-  if [ $(hostname) = "mxw-z490-e" ]; then
-    c ~/.config/sublime-text/Packages/User/
-  else
-    c ~/.config/sublime-text-3/Packages/User/
-  fi
-}
-
-alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
-alias cb='cd ~/Documents/repos/dotfiles/'
-alias se='source'
-
-alias cr="cd ~/Documents/repos"
-alias crhl="cd ~/Documents/repos/haskell-learning"
-
-alias crr="cd ~/Documents/repos/rtr/rtr"
-alias crj="cd ~/Documents/repos/rtr/fe"
-
-alias fn='find -type f -name'
-alias f='find -type f'
-
-# Find text files only.
-alias ftfo='find . -type f -exec grep -Iq . {} \; -print'
-
-alias ll='ls -A1F'
-
-# Old aliases used when at MC:
-# The only difference between 'fr' and 'frb' is that 'fr' also omits ./db/migrate.
-# alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
-# alias frb='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml  -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f -print'
-
-# Updated for Brio:
-alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -name _site -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock -o -name npm-debug.log -o -name dist -o -name package-lock.json -o -path ./static  -o -name __pycache__  -o -path ./not_garbage \) -prune -o -type f -print'
 
 
-# Find all files without spaces in their names.
-alias fs='find . -type f ! -iregex "\./.+ .+" -print'
 
-# Includes the test from fs to filter out filenames containing spaces.
-alias frs='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f ! -iregex "\./.+ .+" -print'
 
-alias fjr='find .  \( -path ./ia-writer \) -prune -o -type f -print'
-# 2019-05-10 hacking on find commands.
-# find . ! -iregex '.*/[\.a-z0-9-]*'
-# "!" negates the following test, regexes match the whole file path.
-#
-# find everything:
-# find . -iregex '\./.+'
-#
-# find everything that doesn't contain a space:
-# find . ! -iregex '\./.+ .+'
 
-alias gp='grep -E -i'
-alias gpni='grep -E'
-alias gpvni='grep -E -v'
-alias gpv='grep -E -v -i'
 
+
+
+
+
+
+
+
+
+
+### ~~ SYSTEM ~~ ###
+
+alias spo='sudo poweroff'
+
+
+alias sa='sudo apt'
 alias sai='sudo apt install'
+alias sdi='sudo dpkg -i'
 alias sau='sudo apt update'
 alias saug='sudo apt upgrade'
-alias sa='sudo apt'
 
-alias sdi='sudo dpkg -i'
+# "list installed packages"
+alias lip='apt list --installed'
 
-alias cl='clear'
-alias spo='sudo poweroff'
+# To remove a package:
+# sudo apt remove <application_name>
+
+
+alias fix_wifi='sudo systemctl restart network-manager.service'
+
+alias gcs='google-chrome-stable'
+
+
+# Check motherboard, CPU, GPU temp readings:
+# sensors
+
+# To edit keymappings on Ubuntu 20.04, visit /usr/share/X11/xkb/symbols/
+# and edit e.g. the pc file.
+alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
+
+# https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used
+alias xorwayland="loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}'"
+
+alias vc='veracrypt'
+
+
+function save_power {
+  sudo tlp start battery
+  sudo pm-powersave battery
+}
+
+function go_fast {
+  sudo tlp start ac
+  sudo pm-powersave ac
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ OTHER ~~ ###
+
+
+# Ecryption and decryption:
+alias enc='gpg --pinentry-mode loopback --symmetric'
+alias dec='gpg --pinentry-mode loopback --decrypt'
+#
+# Locally, --pinentry-mode loopback seems to use cmdline input instead of the
+# UI dialog.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ DEVELOPMENT ~~ ###
+
+
+alias untracked_files='git ls-files --others --exclude-standard'
+alias utf='untracked_files'
+alias sutf='subl $(untracked_files)'
+
+alias glsm='git ls-files -m'
+
+alias rmrfdt='rm -rf dist/* tmp/*'
+
+
 
 alias umf='git diff --name-only --diff-filter=U'
 
@@ -475,7 +739,64 @@ alias umf='git diff --name-only --diff-filter=U'
 #   popd
 # }
 
-alias vc='veracrypt'
+
+# export SET_IN_REDIS_IN_DEVELOPMENT='true'
+alias start_redis='sudo /etc/init.d/redis_6379 start'
+
+# 2022-05-01 commented out the following, new rvm doesn't seem to like it?
+#
+# For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
+# export PATH=~/.local/bin:$PATH
+
+alias pf='pip freeze | grep -v 'pkg-resources==0.0.0''
+
+function rpc {
+  rm $(find -name *.pyc)
+}
+
+function drm {
+  docker rm -f $(docker ps -a -q)
+}
+
+alias py='python3'
+alias pt='pytest'
+
+
+alias rdm='rake db:migrate'
+
+alias es='ember serve --proxy http://localhost:3200'
+alias rs='rails server'
+alias ces='ce && es'
+alias crs='cr && rs'
+
+
+function nsv {
+  npm show $1 version
+}
+
+function egm {
+  ember g model --pod true "$@"
+}
+
+
+# Use this command to open a new pull request for the current branch, and immediately open it in
+# Chrome.
+# -m "$(lcm)"
+function hpr {
+  newline=$'\n'
+  content=`cat $(dnif PULL_REQUEST_TEMPLATE)`
+  template_text=$newline$content
+
+  # For reference, here's part of my previious implementation:
+  #   last_commit_message=`lcm`
+  #   newline=$'\n'
+  #   message="$last_commit_message
+  # $template_text"
+  #   $message > ~/test_file
+  #   echo $message
+
+  gcs $(hub pull-request -m "$(current_branch)$template_text" "$@") &
+}
 
 
 
@@ -483,31 +804,7 @@ alias vc='veracrypt'
 
 
 
-
-
-# MC_HOME is not exported, since no child process should need to access it.
-# alias cs="cd $MC_HOME" doesn't work on OSX without using double quotes.
-MC_HOME="$HOME/Documents/mc"
-MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
-MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
-
-alias vepr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
-alias vrpr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
-
-alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
-
-
-
-
-
-
-alias untracked_files='git ls-files --others --exclude-standard'
-alias utf='untracked_files'
-alias sutf='subl $(untracked_files)'
-
-alias glsm='git ls-files -m'
-
-alias rmrfdt='rm -rf dist/* tmp/*'
+### ~~ GIT ~~ ###
 
 source /usr/share/bash-completion/completions/git
 
@@ -589,71 +886,8 @@ alias ggpa='git rev-list --all | xargs git grep'
 
 alias lola='git log --graph --decorate --pretty=oneline --abbrev-commit --all'
 
-alias s='subl'
-alias v='code-insiders'
-
-alias rdm='rake db:migrate'
-
-alias hrrdm='heroku run rake db:migrate -a shearwater'
-alias hrrdmd='heroku run rake db:migrate -a shearwater-demo'
-alias hrrdms='heroku run rake db:migrate -a shearwater-staging'
-
-alias rcpts='rake copy_production_to_staging'
-
-alias eb='subl ~/.bashrc'
-alias ebp='subl ~/.bash_profile'
-alias sb='source ~/.bashrc'
-alias sbp='source ~/.bash_profile'
-
-alias c1='cd ..'
-alias c2='cd ../..'
-alias c3='cd ../../..'
-alias c4='cd ../../../..'
-alias c5='cd ../../../..'
-alias c6='cd ../../../../..'
-
-alias gcs='google-chrome-stable'
-
-alias es='ember serve --proxy http://localhost:3200'
-alias rs='rails server'
-alias ces='ce && es'
-alias crs='cr && rs'
-
-alias fix_wifi='sudo systemctl restart network-manager.service'
-
-alias ras='/usr/local/android-studio/bin/studio.sh &'
-
-# "list installed packages"
-alias lip='apt list --installed'
-
-# To remove a package:
-# sudo apt remove <application_name>
-
-function nsv {
-  npm show $1 version
-}
-
-function egm {
-  ember g model --pod true "$@"
-}
-
-function save_power {
-  sudo tlp start battery
-  sudo pm-powersave battery
-}
-
-function go_fast {
-  sudo tlp start ac
-  sudo pm-powersave ac
-}
-
-function sgl {
-  subl $(gpfr -l "$@")
-}
-
-function sglni {
-  subl $(gpnifr -l "$@")
-}
+# "Last Commit Message"
+alias lcm='git log -1 --pretty=%B'
 
 function gdcm {
   local branch=$(current_branch)
@@ -667,63 +901,6 @@ function gdcm {
   git branch -D $branch
 }
 
-# "Last Commit Message"
-alias lcm='git log -1 --pretty=%B'
-
-# All credit goes to http://stackoverflow.com/a/24642735/1067145
-function dnif {
-  # Recursively list a file from PWD up the directory tree to root
-  [[ -n $1 ]] || { echo "dnif [ls-opts] name"; return 1; }
-  local THERE=$PWD RC=2
-  while [[ $THERE != / ]]
-      do [[ -e $THERE/${2:-$1} ]] && { ls ${2:+$1} $THERE/${2:-$1}; RC=0; }
-          THERE=$(dirname $THERE)
-      done
-  [[ -e $THERE/${2:-$1} ]] && { ls ${2:+$1} /${2:-$1}; RC=0; }
-  return $RC
-}
-
-# Use this command to open a new pull request for the current branch, and immediately open it in
-# Chrome.
-# -m "$(lcm)"
-function hpr {
-  newline=$'\n'
-  content=`cat $(dnif PULL_REQUEST_TEMPLATE)`
-  template_text=$newline$content
-
-  # For reference, here's part of my previious implementation:
-  #   last_commit_message=`lcm`
-  #   newline=$'\n'
-  #   message="$last_commit_message
-  # $template_text"
-  #   $message > ~/test_file
-  #   echo $message
-
-  gcs $(hub pull-request -m "$(current_branch)$template_text" "$@") &
-}
-
-# TODO: rework the "force" versions of these commands to use:
-#   git subtree push --prefix web heroku master
-# or its ilk. When deleting and then re-creating the remote branch, Heroku's deploy hooks don't
-# always pick it up.
-
-function rdd {
-  # Implement!
-  exit 1
-}
-
-function rrfpuc {
-  pushd $MC_RAILS_HOME
-  rake restore_from_most_recent_production_backup
-  popd
-}
-
-function rrfp {
-  pushd $MC_RAILS_HOME
-  rake restore_from_most_recent_saved_production_backup
-  popd
-}
-
 # In the current feature branch-- how many commits do we have that aren't in main?
 function commits_ahead_of_main {
   git rev-list $(current_branch) --not main | wc -l
@@ -734,127 +911,6 @@ alias rfb='git rebase -i HEAD~$(commits_ahead_of_main)'
 
 alias cam='commits_ahead_of_main'
 
-function c {
-  cd $1
-  ls
-}
-
-# Can be used to rename, e.g. methods.
-# $1 - the search pattern
-# $2 - the replace string
-#
-# In sed, the -E flag (for Extended regex support) reverses the meaning of "(" and "\(".
-# -i is --in-place
-function sr {
-  gpni -l "$1" $(fr) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
-}
-
-function srof {
-  echo "$3" | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
-}
-
-function srcrm {
-  gpni -l "$1" $(crm) | xargs -I filepath sed -i -E "s/$1/$2/g" filepath
-}
-
-
-# This function is commented out until I have a chance to finish it.
-# function srf {
-  # fr | gpni $1 | xargs -I filepath
-  # gpni -l $1 $(fr) | xargs -I filename echo
-# }
-
-# -n
-function srn {
-  gpni -l $1 $(fr)
-}
-
-function gpf {
-  gp --color "$@" $(f)
-}
-
-function gpfs {
-  gp --color "$@" $(fs)
-}
-
-function gpfr {
-  gp --color "$@" $(fr)
-}
-function gpfj {
-  cd ~/Dropbox/personal/journals
-  gp --color "$@" $(fjr)
-}
-alias gr='gpfr'
-
-function gpfrb {
-  gp --color "$@" $(frb)
-}
-
-function gpnif {
-  gpni --color "$@" $(f)
-}
-
-function gpnifr {
-  gpni --color "$@" $(fr)
-}
-
-function rbc {
-  rubocop -D -a $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
-}
-
-function rbcna {
-  rubocop -D $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
-}
-
-function rbca {
-  rubocop -D -a "$@"
-}
-
-function rbd {
-  rubocop -D "$@"
-}
-
-alias rc='rails c'
-# function rc {
-#   pushd $MC_RAILS_HOME
-#   bin/rails console
-#   popd
-# }
-
-# function rt {
-#   pushd $MC_RAILS_HOME
-#   rake test
-#   popd
-# }
-
-function rtns {
-  pushd $MC_RAILS_HOME
-  SHEARWATER_DONT_SKIP_TESTS=true rake test
-  popd
-}
-
-function catchmail {
-  gem install mailcatcher
-  mailcatcher
-  google-chrome-stable http://127.0.0.1:1080
-}
-
-function rotate_all_pd {
-  for file in $(find -maxdepth 1 -type f -printf "%f\n")
-  do
-    convert "$file" -rotate 90 ../$file
-  done
-}
-alias rapd='rotate_all_pd'
-
-function rotate_all {
-  mkdir ./prerotated
-  for file in $(find -maxdepth 1 -type f -printf "%f\n")
-  do
-    mv $file ./prerotated/$file
-    convert "./prerotated/$file" -rotate 90 ./$file
-  done
-}
 
 function gssp {
   eval "git stash show -p stash@{$1}"
@@ -864,12 +920,12 @@ function gcount {
   git log $1..$2 --pretty=oneline | wc -l
 }
 
-function op {
-  git status --short | awk '$1 ~ /^M|A|U/ {print $2}'
-}
-
 function dno {
   git diff --name-only
+}
+
+function op {
+  git status --short | awk '$1 ~ /^M|A|U/ {print $2}'
 }
 
 function sop {
@@ -886,11 +942,6 @@ function current_branch {
 
 function gpsu {
   git push --set-upstream origin $(current_branch)
-}
-
-function rcs {
-  mcs $1
-  eval "./$1"
 }
 
 function delete_merged_branches {
@@ -913,6 +964,182 @@ function delete_elis_branches {
 }
 
 alias desbs='delete_elis_branches'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ RTR ~~ ###
+alias crr="cd ~/Documents/repos/rtr/rtr"
+alias crj="cd ~/Documents/repos/rtr/fe"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ MC ~~ ###
+
+# MC_HOME is not exported, since no child process should need to access it.
+# alias cs="cd $MC_HOME" doesn't work on OSX without using double quotes.
+MC_HOME="$HOME/Documents/repos/mc"
+MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
+MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
+
+# alias vepr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
+# alias vrpr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
+# alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
+
+# alias hrrdm='heroku run rake db:migrate -a shearwater'
+# alias hrrdmd='heroku run rake db:migrate -a shearwater-demo'
+# alias hrrdms='heroku run rake db:migrate -a shearwater-staging'
+
+# alias rcpts='rake copy_production_to_staging'
+
+# TODO: rework the "force" versions of these commands to use:
+#   git subtree push --prefix web heroku master
+# or its ilk. When deleting and then re-creating the remote branch, Heroku's deploy hooks don't
+# always pick it up.
+
+# function rdd {
+#   # Implement!
+#   exit 1
+# }
+
+# function rrfpuc {
+#   pushd $MC_RAILS_HOME
+#   rake restore_from_most_recent_production_backup
+#   popd
+# }
+
+# function rrfp {
+#   pushd $MC_RAILS_HOME
+#   rake restore_from_most_recent_saved_production_backup
+#   popd
+# }
+
+# function rc {
+#   pushd $MC_RAILS_HOME
+#   bin/rails console
+#   popd
+# }
+
+# function rt {
+#   pushd $MC_RAILS_HOME
+#   rake test
+#   popd
+# }
+
+# function rtns {
+#   pushd $MC_RAILS_HOME
+#   SHEARWATER_DONT_SKIP_TESTS=true rake test
+#   popd
+# }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+alias rc='rails c'
+
+function rbc {
+  rubocop -D -a $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+}
+
+function rbcna {
+  rubocop -D $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+}
+
+function rbca {
+  rubocop -D -a "$@"
+}
+
+function rbd {
+  rubocop -D "$@"
+}
+
+function catchmail {
+  gem install mailcatcher
+  mailcatcher
+  google-chrome-stable http://127.0.0.1:1080
+}
+
+
+
+
+# no idea what this is
+function rcs {
+  mcs $1
+  eval "./$1"
+}
+
+
+
 
 function sublime_create_project {
   if [ -z "$1" ]; then
