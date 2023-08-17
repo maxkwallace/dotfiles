@@ -1,41 +1,12 @@
+### ~~ BASH ~~ ###
+
+
 # May be useful to read https://github.com/anordal/shellharden/blob/master/how_to_do_things_safely_in_bash.md
 
-# MC_HOME is not exported, since no child process should need to access it.
-MC_HOME="$HOME/Documents/mc"
-MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
-MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
-
-
-alias cdl='cd ~/Downloads'
-
-
-# To edit keymappings on Ubuntu 20.04, visit /usr/share/X11/xkb/symbols/
-# and edit e.g. the pc file.
-alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
-
-function back_up_talon {
-  cd "/home/mjw/Dropbox/everything-else/talon-backup"
-  FOLDERNAME=$(date "+%Y-%m-%d-%H-%M")
-  mkdir $FOLDERNAME
-  cd $FOLDERNAME
-  cp -r ~/.talon/user/* .
-  rm -rf cursorless-talon/ knausj_talon/ rango-talon/
-}
-
-# Check motherboard, CPU, GPU temp readings
-# sensors
-
-# Remove EXIF data from an image:
-# mogrify -strip a.jpg
-
-# function ffncd {
-#   find . -type f -name "$1"
-# }
-#
-# function gpf {
-#   grep -E "$2" $(ffncd $1)
-# }
-
+# single vs. double quotes in Bash:
+# - Single quotes perserve the literal value of each character in the quotes-- no interpolation.
+# - Double quotes do the same, except for $, `, \, and !
+# See http://stackoverflow.com/a/6697781/1067145
 
 # Test if a variable is unset or a length-zero string:
 # if [ -z "$bar" ]
@@ -64,26 +35,11 @@ function back_up_talon {
 # my_command | while read l; do something_with "$l"; done
 # look into: https://github.com/soveran/map
 
-function rt {
-  cd ~/Documents/talon-linux-114-0.3.1/talon
-  ./run.sh
-}
-
-function ct {
-  cd ~/.talon/user/mxw-talon
-}
-
-function ctp {
-  cd ~/Documents/talon-linux-114-0.3.1/talon/resources/python/lib/python3.9/site-packages/talon
-}
 
 
-# Ecryption and decryption:
-alias enc='gpg --pinentry-mode loopback --symmetric'
-alias dec='gpg --pinentry-mode loopback --decrypt'
-#
-# Locally, --pinentry-mode loopback seems to use cmdline input instead of the
-# UI dialog.
+
+
+
 
 # Regex cheatsheet:
 # Totally portable (AFAIK):
@@ -103,15 +59,40 @@ alias dec='gpg --pinentry-mode loopback --decrypt'
 # ‘\S - Match non-whitespace, it is a synonym for ‘[^[:space:]]’.
 
 
-# Utility commands:
-# List total sizes of directories in current folder: du -sh -- *
-alias dush='du -sh -- *'
+
+
+
+
+
+
+
+
+# Check motherboard, CPU, GPU temp readings:
+# sensors
+
+# To edit keymappings on Ubuntu 20.04, visit /usr/share/X11/xkb/symbols/
+# and edit e.g. the pc file.
+alias exkbpc='sudo vim /usr/share/X11/xkb/symbols/pc'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ~~ FILES & DIRECTORIES ~~ ###
+
 
 # Wordcount lines for each file in dirctory:
 # find . -maxdepth 1 -type f -exec wc -l {} \;
-
-# Making random strings:
-# (0..37).to_a.map { (('A'..'z').to_a + ('0'..'9').to_a).sample }.join
 
 # Renaming:
 # https://gist.github.com/premek/6e70446cfc913d3c929d7cdbfe896fef
@@ -133,16 +114,85 @@ alias dush='du -sh -- *'
 
 
 
+
+
+
+
+
+
+
+
+
+function back_up_talon {
+  cd "/home/mjw/Dropbox/everything-else/talon-backup"
+  FOLDERNAME=$(date "+%Y-%m-%d-%H-%M")
+  mkdir $FOLDERNAME
+  cd $FOLDERNAME
+  cp -r ~/.talon/user/* .
+  rm -rf cursorless-talon/ knausj_talon/ rango-talon/
+}
+
+function rt {
+  cd ~/Documents/talon-linux-114-0.3.1/talon
+  ./run.sh
+}
+
+function ct {
+  cd ~/.talon/user/mxw-talon
+}
+
+function ctp {
+  cd ~/Documents/talon-linux-114-0.3.1/talon/resources/python/lib/python3.9/site-packages/talon
+}
+
+
+
+# function ffncd {
+#   find . -type f -name "$1"
+# }
+#
+# function gpf {
+#   grep -E "$2" $(ffncd $1)
+# }
+
+
+alias cdl='cd ~/Downloads'
+
+
+
+# Ecryption and decryption:
+alias enc='gpg --pinentry-mode loopback --symmetric'
+alias dec='gpg --pinentry-mode loopback --decrypt'
+#
+# Locally, --pinentry-mode loopback seems to use cmdline input instead of the
+# UI dialog.
+
+
+# Making random strings in Ruby:
+# (0..37).to_a.map { (('A'..'z').to_a + ('0'..'9').to_a).sample }.join
+
+
+# Utility commands:
+# List total sizes of directories in current folder: du -sh -- *
+alias dush='du -sh -- *'
+
+
+# ${1:-5} uses 5 if $1 is null or unset.
 function find_largest_files {
-  find -type f -exec du -Sh {} + | sort -rh | head -n ${1-5}
+  find -type f -exec du -Sh {} + | sort -rh | head -n ${1:-5}
 }
 alias flf='find_largest_files'
 
+# If run with no arguments, deletes the largest file in subdirectories.
+# Pass an argument to delete additional files.
 function find_largest_files_delete {
-  find_largest_files ${1-1} | cut -d$'\t' -f 2- | xargs -d'\n' rm -v
+  find_largest_files ${1:-1} | cut -d$'\t' -f 2- | xargs -d'\n' rm -v
 }
 alias flfd='find_largest_files_delete'
 
+
+
+### ~~ AUDIO ~~  ###
 
 
 # Convert to FLAC:
@@ -268,13 +318,6 @@ function flac_to_ogg_subdir_2 {
 # Splitting FLAC with cue file
 # cuebreakpoints file.cue | shnsplit -o flac file.flac
 
-# Convert webp:
-# dwebp file.webp -o abc.png
-#
-# for file in $(ls *.webp)
-# do
-#   dwebp $file -o ${file:0:-5}.png
-# done
 
 # Remove intermediate directories (doesn't work?)
 # for dir in $(ls)
@@ -297,33 +340,44 @@ function flac_to_ogg_subdir_2 {
 #   cd ..
 # done
 
+
+
+### ~~ IMAGES ~~  ###
+
+# Convert webp:
+# dwebp file.webp -o abc.png
+#
+# for file in $(ls *.webp)
+# do
+#   dwebp $file -o ${file:0:-5}.png
+# done
 function wtp {
   input=$1
   dwebp "$input" -o "${input%.*}.png"
 }
 
+# Remove EXIF data from an image:
+# mogrify -strip a.jpg
+
+
 # Unzip all zipfiles in subdirectories and delete the archives:
 # find . -depth -name '*.zip' -execdir /usr/bin/unzip -n {} \; -delete
 
 
-# For Redshift issues:
-# https://github.com/xflux-gui/fluxgui/issues/27
 
 # export SET_IN_REDIS_IN_DEVELOPMENT='true'
 alias start_redis='sudo /etc/init.d/redis_6379 start'
 
-# Note to self-- single vs. double quotes:
-# - Single quotes perserve the literal value of each character in the quotes-- no interpolation.
-# - Double quotes do the same, except for $, `, \, and !
-# See http://stackoverflow.com/a/6697781/1067145
 
 export VISUAL=subl
 export EDITOR="$VISUAL"
 export GIT_EDITOR=vim
 
+
 # 2022-05-01 commented out the following, new rvm doesn't seem to like it?
-  # For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
-  # export PATH=~/.local/bin:$PATH
+#
+# For http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
+# export PATH=~/.local/bin:$PATH
 
 
 alias pf='pip freeze | grep -v 'pkg-resources==0.0.0''
@@ -355,13 +409,11 @@ alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
 alias cb='cd ~/Documents/repos/dotfiles/'
 alias se='source'
 
-# alias cs="cd $MC_HOME" doesn't work on OSX without using double quotes.
 alias cr="cd ~/Documents/repos"
 alias crhl="cd ~/Documents/repos/haskell-learning"
 
 alias crr="cd ~/Documents/repos/rtr/rtr"
 alias crj="cd ~/Documents/repos/rtr/fe"
-alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
 
 alias fn='find -type f -name'
 alias f='find -type f'
@@ -425,8 +477,29 @@ alias umf='git diff --name-only --diff-filter=U'
 
 alias vc='veracrypt'
 
+
+
+
+
+
+
+
+
+# MC_HOME is not exported, since no child process should need to access it.
+# alias cs="cd $MC_HOME" doesn't work on OSX without using double quotes.
+MC_HOME="$HOME/Documents/mc"
+MC_EMBER_HOME="$MC_HOME/mentorcollective-ember"
+MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
+
 alias vepr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
 alias vrpr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
+
+alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
+
+
+
+
+
 
 alias untracked_files='git ls-files --others --exclude-standard'
 alias utf='untracked_files'
@@ -542,21 +615,9 @@ alias c6='cd ../../../../..'
 alias gcs='google-chrome-stable'
 
 alias es='ember serve --proxy http://localhost:3200'
-alias rs='bundle exec bin/rails s --port 3200' # port=3200 doesn't work; I'm not sure why.
+alias rs='rails server'
 alias ces='ce && es'
 alias crs='cr && rs'
-
-alias eds='ember deploy staging'
-alias edsa='ember deploy staging --activate'
-alias edd='ember deploy demo'
-alias edda='ember deploy demo --activate'
-alias edp='ember deploy production'
-alias edpa='ember deploy production --activate'
-alias edpma='ember deploy prodmirror --activate'
-
-alias et='ember test'
-
-alias er='elm reactor -a=localhost'
 
 alias fix_wifi='sudo systemctl restart network-manager.service'
 
@@ -720,6 +781,7 @@ function gpfr {
   gp --color "$@" $(fr)
 }
 function gpfj {
+  cd ~/Dropbox/personal/journals
   gp --color "$@" $(fjr)
 }
 alias gr='gpfr'
