@@ -108,6 +108,70 @@ function sglni {
 }
 
 
+function sublime_create_project {
+  if [ -z "$1" ]; then
+    echo 'Error: a project name is required'
+    return
+  fi
+
+  project_name="${1%/}"
+  filename="$project_name.sublime-project"
+  touch $filename
+
+  # Tried <<-, didn't work-- can't get bash to automatically ignore leading whitespace.
+  tee $filename <<FILE_CONTENTS > /dev/null
+{
+  "folders":
+  [
+    {
+      "path": "$project_name"
+    }
+  ]
+}
+FILE_CONTENTS
+}
+
+
+function sublime_create_and_open_project {
+  sublime_create_project $1
+  subl "${1%/}.sublime-project"
+}
+
+alias scpt='sublime_create_project'
+alias scopt='sublime_create_and_open_project'
+
+alias sur='set_up_repo'
+
+# Call like:
+# :~$ set_up_repo username/repo-name
+function set_up_repo {
+  array_form=(${1//\// })
+  folder_name=${array_form[1]}
+
+  cd ~/Documents/repos
+  mkdir $folder_name
+  cd ~/Documents/repos/$folder_name
+
+  git clone 'git@github.com:'$1'.git'
+  sublime_create_and_open_project $folder_name'/'
+}
+
+function set_up_candidate_repo {
+  array_form=(${1//\// })
+  gh_username=${array_form[0]}
+  folder_name=${array_form[1]}
+
+  cd ~/candidates
+
+  mkdir $gh_username
+  cd $gh_username
+
+  mkdir $folder_name
+  cd $folder_name
+
+  git clone 'git@github.com:'$1'.git'
+  sublime_create_and_open_project $folder_name'/'
+}
 
 
 
@@ -282,7 +346,28 @@ function dnif {
 }
 
 
+# Mostly for papers in sources/
+function ren {
+  rename -v 's/ /-/g' *
+  rename -v 's/_/-/g' *
+  rename -v 's/[0-9]//g' *
+  rename -v 's/[)(]//g' *
+  rename -v 's/\.(?=[^.]*\.)/-/g' *
+}
 
+# Fixing filenames for Windows
+function renw {
+  rename -v 's/
+/_/g' *
+  rename -v 's/\?/_/g' *
+  rename -v 's/:/_/g' *
+}
+
+# For music files
+function ren2 {
+  rename -v 's/ /-/g' *
+  rename -v 's/[)(]//g' *
+}
 
 
 
@@ -379,7 +464,18 @@ function srcrm {
   # gpni -l $1 $(fr) | xargs -I filename echo
 # }
 
+# If you need a newline in a string, you must use $'\n'.
+# rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
+alias rff='runhaskell ~/Documents/repos/hsutils/hsutils/regex-remove-from-files.hs'
 
+function crff {
+  git commit -am "Remove lines matching $1"
+}
+
+# Does not work for some reason :(
+# function rbp {
+#   rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
+# }
 
 
 
@@ -421,8 +517,15 @@ function back_up_talon {
 
 
 
-### ~~ AUDIO ~~  ###
+### ~~ AUDIO & VIDEO ~~  ###
 
+# to_mp3 only works on one file per command-- if you want to convert multiple files, you'll need
+# something like:
+# for f in *; do to_mp3 "$f"; done
+function to_mp3 {
+  input=$1
+  avconv -i "$input" -qscale:a 0 "${input%.*}.mp3"
+}
 
 # Convert to FLAC:
 # mkdir flac
@@ -548,6 +651,60 @@ function flac_to_ogg_subdir_2 {
 # cuebreakpoints file.cue | shnsplit -o flac file.flac
 
 
+function dl_yt_audio {
+  yt-dlp -f 'bestaudio' -o 'download.%(ext)s' $1
+
+  if [ ! -f download.webm ]; then
+      echo "Didn't get a webm"
+      return
+  fi
+
+  ffmpeg -i "download.webm" -vn -acodec copy "audio.opus"
+
+  if [ ! -f audio.opus ]; then
+      echo "No audio.opus file"
+      return
+  fi
+
+  # ffmpeg -i "audio.opus" "audio.flac"
+  rm download.webm
+  # rm audio.opus
+}
+
+function wtm {
+  input=$1
+  # ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
+  ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}.mp4"
+}
+
+function compressv {
+  input=$1
+
+  ffmpeg -i $1 -vcodec libx265 -crf 24 "${input%.*}-1.mp4"
+  if [ -f "${input%.*}-1.mp4" ]; then
+      rm "$1"
+  else
+      echo "error: no output file"
+  fi
+}
+
+function halfframev {
+  input=$1
+
+  ffmpeg -i $1 -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 24 "${input%.*}-1.mp4"
+  if [ -f "${input%.*}-1.mp4" ]; then
+     rm "$1"
+  else
+     echo "error: no output file"
+  fi
+}
+
+
+function mtm {
+  input=$1
+  # ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
+  ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}-2.mp4"
+}
 
 
 
@@ -671,31 +828,12 @@ function go_fast {
   sudo pm-powersave ac
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ~~ OTHER ~~ ###
-
-
-# Ecryption and decryption:
-alias enc='gpg --pinentry-mode loopback --symmetric'
-alias dec='gpg --pinentry-mode loopback --decrypt'
+# MSR means Model-specific register. 0x19a has something to do with clock modulation / power
+# conservation.
 #
-# Locally, --pinentry-mode loopback seems to use cmdline input instead of the
-# UI dialog.
+# See: http://askubuntu.com/questions/792605/ubuntu-16-04-lts-too-slow-after-suspend-and-resume
+alias rd_speed_msr='sudo rdmsr -a 0x19a'
+alias wr_speed_msr='sudo wrmsr -a 0x19a 0x0'
 
 
 
@@ -797,6 +935,40 @@ function hpr {
 
   gcs $(hub pull-request -m "$(current_branch)$template_text" "$@") &
 }
+
+alias rc='rails c'
+
+function rbc {
+  rubocop -D -a $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+}
+
+function rbcna {
+  rubocop -D $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
+}
+
+function rbca {
+  rubocop -D -a "$@"
+}
+
+function rbd {
+  rubocop -D "$@"
+}
+
+function catchmail {
+  gem install mailcatcher
+  mailcatcher
+  google-chrome-stable http://127.0.0.1:1080
+}
+
+# Drop all databases in Postgres:
+#
+# sudo -u postgres psql
+#
+# select 'drop database "'||datname||'";'
+# from pg_database
+# where datistemplate=false;
+#
+# psql -d postgres -f dd.sql
 
 
 
@@ -944,6 +1116,11 @@ function gpsu {
   git push --set-upstream origin $(current_branch)
 }
 
+
+alias changed_relative_to_main='g diff --name-only main'
+alias crm='changed_relative_to_main'
+
+
 function delete_merged_branches {
   if [ "main" != $(current_branch) ];
   then
@@ -964,31 +1141,6 @@ function delete_elis_branches {
 }
 
 alias desbs='delete_elis_branches'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ~~ RTR ~~ ###
-alias crr="cd ~/Documents/repos/rtr/rtr"
-alias crj="cd ~/Documents/repos/rtr/fe"
-
-
-
-
-
-
 
 
 
@@ -1056,6 +1208,10 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 #   popd
 # }
 
+# alias hrrc='heroku run rails console --app shearwater' etc.
+# alias hlt='heroku logs --tail --app shearwater'
+# alias hpgbc='heroku pg:backups capture -a shearwater'
+# alias hppas='heroku pipelines:promote -a shearwater-staging'
 
 
 
@@ -1066,6 +1222,9 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
 
 
+### ~~ RTR ~~ ###
+alias crr="cd ~/Documents/repos/rtr/rtr"
+alias crj="cd ~/Documents/repos/rtr/fe"
 
 
 
@@ -1075,258 +1234,75 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
 
 
+### ~~ OTHER ~~ ###
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-alias rc='rails c'
-
-function rbc {
-  rubocop -D -a $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
-}
-
-function rbcna {
-  rubocop -D $(changed_relative_to_main | grep -v '\.html\.erb$' | grep -v Gemfile | grep -v '\.yml$' | grep -v '/templates/' | grep -v 'schema\.rb')
-}
-
-function rbca {
-  rubocop -D -a "$@"
-}
-
-function rbd {
-  rubocop -D "$@"
-}
-
-function catchmail {
-  gem install mailcatcher
-  mailcatcher
-  google-chrome-stable http://127.0.0.1:1080
-}
-
-
-
-
-# no idea what this is
-function rcs {
-  mcs $1
-  eval "./$1"
-}
-
-
-
-
-function sublime_create_project {
-  if [ -z "$1" ]; then
-    echo 'Error: a project name is required'
-    return
-  fi
-
-  project_name="${1%/}"
-  filename="$project_name.sublime-project"
-  touch $filename
-
-  # Tried <<-, didn't work-- can't get bash to automatically ignore leading whitespace.
-  tee $filename <<FILE_CONTENTS > /dev/null
-{
-  "folders":
-  [
-    {
-      "path": "$project_name"
-    }
-  ]
-}
-FILE_CONTENTS
-}
-
-function sublime_create_and_open_project {
-  sublime_create_project $1
-  subl "${1%/}.sublime-project"
-}
-
-alias scpt='sublime_create_project'
-alias scopt='sublime_create_and_open_project'
-
-alias sur='set_up_repo'
-
-# Call like:
-# :~$ set_up_repo username/repo-name
-function set_up_repo {
-  array_form=(${1//\// })
-  folder_name=${array_form[1]}
-
-  cd ~/Documents/repos
-  mkdir $folder_name
-  cd ~/Documents/repos/$folder_name
-
-  git clone 'git@github.com:'$1'.git'
-  sublime_create_and_open_project $folder_name'/'
-}
-
-function set_up_candidate_repo {
-  array_form=(${1//\// })
-  gh_username=${array_form[0]}
-  folder_name=${array_form[1]}
-
-  cd ~/candidates
-
-  mkdir $gh_username
-  cd $gh_username
-
-  mkdir $folder_name
-  cd $folder_name
-
-  git clone 'git@github.com:'$1'.git'
-  sublime_create_and_open_project $folder_name'/'
-}
-
-alias hrrc='heroku run rails console --app shearwater'
-alias hrrcs='heroku run rails console --app shearwater-staging'
-alias hrrcd='heroku run rails console --app shearwater-demo'
-alias hrrcpm='heroku run rails console --app shearwater-prodmirror'
-
-alias hlt='heroku logs --tail --app shearwater'
-alias hlts='heroku logs --tail --app shearwater-staging'
-alias hltd='heroku logs --tail --app shearwater-demo'
-alias hltpm='heroku logs --tail --app shearwater-prodmirror'
-
-alias hpgbc='heroku pg:backups capture -a shearwater'
-alias hpgbcs='heroku pg:backups capture -a shearwater-staging'
-alias hpgbcd='heroku pg:backups capture -a shearwater-demo'
-
-alias hppas='heroku pipelines:promote -a shearwater-staging'
-
-# MSR means Model-specific register. 0x19a has something to do with clock modulation / power
-# conservation.
+# Ecryption and decryption:
+alias enc='gpg --pinentry-mode loopback --symmetric'
+alias dec='gpg --pinentry-mode loopback --decrypt'
 #
-# See: http://askubuntu.com/questions/792605/ubuntu-16-04-lts-too-slow-after-suspend-and-resume
-alias rd_speed_msr='sudo rdmsr -a 0x19a'
-alias wr_speed_msr='sudo wrmsr -a 0x19a 0x0'
-
-# to_mp3 only works on one file per command-- if you want to convert multiple files, you'll need
-# something like:
-# for f in *; do to_mp3 "$f"; done
-function to_mp3 {
-  input=$1
-  avconv -i "$input" -qscale:a 0 "${input%.*}.mp3"
-}
-
-alias changed_relative_to_main='g diff --name-only main'
-alias crm='changed_relative_to_main'
-
-function dl_yt_audio {
-  yt-dlp -f 'bestaudio' -o 'download.%(ext)s' $1
-
-  if [ ! -f download.webm ]; then
-      echo "Didn't get a webm"
-      return
-  fi
-
-  ffmpeg -i "download.webm" -vn -acodec copy "audio.opus"
-
-  if [ ! -f audio.opus ]; then
-      echo "No audio.opus file"
-      return
-  fi
-
-  # ffmpeg -i "audio.opus" "audio.flac"
-  rm download.webm
-  # rm audio.opus
-}
-
-function wtm {
-  input=$1
-  # ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
-  ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}.mp4"
-}
-
-function compressv {
-  input=$1
-
-  ffmpeg -i $1 -vcodec libx265 -crf 24 "${input%.*}-1.mp4"
-  if [ -f "${input%.*}-1.mp4" ]; then
-      rm "$1"
-  else
-      echo "error: no output file"
-  fi
-}
-
-function halfframev {
-  input=$1
-
-  ffmpeg -i $1 -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 24 "${input%.*}-1.mp4"
-  if [ -f "${input%.*}-1.mp4" ]; then
-     rm "$1"
-  else
-     echo "error: no output file"
-  fi
-}
+# Locally, --pinentry-mode loopback seems to use cmdline input instead of the
+# UI dialog.
 
 
-function mtm {
-  input=$1
-  # ffmpeg -i $1 -qscale 0 "${input%.*}.mp4"
-  ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}-2.mp4"
-}
-
-# Mostly for papers in sources/
-function ren {
-  rename -v 's/ /-/g' *
-  rename -v 's/_/-/g' *
-  rename -v 's/[0-9]//g' *
-  rename -v 's/[)(]//g' *
-  rename -v 's/\.(?=[^.]*\.)/-/g' *
-}
-
-# Fixing filenames for Windows
-function renw {
-  rename -v 's/
-/_/g' *
-  rename -v 's/\?/_/g' *
-  rename -v 's/:/_/g' *
-}
-
-# For music files
-function ren2 {
-  rename -v 's/ /-/g' *
-  rename -v 's/[)(]//g' *
-}
 
 
-# Drop all databases in Postgres:
-#
-# sudo -u postgres psql
-#
-# select 'drop database "'||datname||'";'
-# from pg_database
-# where datistemplate=false;
-#
-# psql -d postgres -f dd.sql
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #### -- BEGIN DEFAULT SECTION, ADDED BY UBUNTU -- ####
@@ -1461,6 +1437,7 @@ fi
 
 #### -- END DEFAULT SECTION -- ####
 
+
 # Update, 2018-02-04: use xbacklight instead.
 # Update, 2019-01-02: use the Ubuntu brightness GUI.
 alias br='brightness'
@@ -1493,20 +1470,7 @@ function read_brightness {
 
 
 
-# Also see functions sr and srcm above for search-and-replace tasks.
-#
-# If you need a newline in a string, you must use $'\n'.
-# rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
-alias rff='runhaskell ~/Documents/repos/hsutils/hsutils/regex-remove-from-files.hs'
 
-function crff {
-  git commit -am "Remove lines matching $1"
-}
-
-# Does not work for some reason :(
-# function rbp {
-#   rff "^.*binding.pry"$'\n' $(fr | gpv 'bin/')
-# }
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
