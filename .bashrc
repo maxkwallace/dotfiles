@@ -240,7 +240,7 @@ alias fr='find .  \( -name .git -o -name tmp -o -name elm-stuff -o -name node_mo
 
 
 # Find all files without spaces in their names.
-alias fs='find . -type f ! -iregex "\./.+ .+" -print'
+alias fns='find . -type f ! -iregex "\./.+ .+" -print'
 
 # Includes the test from fs to filter out filenames containing spaces.
 alias frs='find . \( -name .git -o -name tmp -o -name elm-stuff -o -name node_modules -o -name bower_components -o -name Gemfile.lock -o -name public -o -name log -o -name coverage -o -name skylight.yml -o -name vcr_fixtures -o -name vendor -o -path ./test/reports -o -path ./db/migrate -o -name yarn.lock  -o -name npm-debug.log -o -name dist \) -prune -o -type f ! -iregex "\./.+ .+" -print'
@@ -402,8 +402,8 @@ function gpf {
   gp --color "$@" $(f)
 }
 
-function gpfs {
-  gp --color "$@" $(fs)
+function gpfns {
+  gp --color "$@" $(fns)
 }
 
 function gpfr {
@@ -903,9 +903,6 @@ alias pt='pytest'
 alias rdm='rake db:migrate'
 
 alias es='ember serve --proxy http://localhost:3200'
-alias rs='rails server'
-alias ces='ce && es'
-alias crs='cr && rs'
 
 
 function nsv {
@@ -1224,7 +1221,11 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
 ### ~~ RTR ~~ ###
 alias crr="cd ~/Documents/repos/rtr/rtr"
-alias crj="cd ~/Documents/repos/rtr/fe"
+alias crf="cd ~/Documents/repos/rtr/fe"
+
+alias rs='crr && rails server'
+alias fs='crf && npm run dev'
+
 
 
 
