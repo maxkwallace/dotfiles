@@ -96,7 +96,13 @@ function csubl {
   fi
 }
 
-alias ess='vim ~/.config/sublime-text-3/Local/Session.sublime_session'
+function ess {
+  if [ $(hostname) = "mxw-z490-e" ]; then
+    vim ~/.config/sublime-text/Local/Session.sublime_session
+  else
+    vim ~/.config/sublime-text-3/Local/Session.sublime_session
+  fi
+}
 
 
 function sgl {
@@ -313,7 +319,7 @@ alias fjr='find .  \( -path ./ia-writer \) -prune -o -type f -print'
 
 
 # List total sizes of directories in current folder: du -sh -- *
-alias dush='du -sh -- *'
+alias dush='du -sh $(ls -A)'
 
 
 # ${1:-5} uses 5 if $1 is null or unset.
@@ -1157,7 +1163,7 @@ MC_RAILS_HOME="$MC_HOME/mentorcollective-rails"
 
 # alias vepr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
 # alias vrpr='gcs https://github.com/shearwaterintl/mentorcollective-ember/pulls &'
-# alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
+alias cm="cd ~/Documents/repos/mc/mentorcollective-rails/"
 
 # alias hrrdm='heroku run rake db:migrate -a shearwater'
 # alias hrrdmd='heroku run rake db:migrate -a shearwater-demo'
