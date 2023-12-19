@@ -1515,5 +1515,8 @@ fi
 
 
 # 2023-10-14 https://asdf-vm.com/guide/getting-started.html
-. "$HOME/.asdf/asdf.sh"
-. "$HOME/.asdf/completions/asdf.bash"
+if [ $(hostname) = "mxw-z490-e" ]; then
+  . "$HOME/.asdf/asdf.sh"
+  . "$HOME/.asdf/completions/asdf.bash"
+fi
+
