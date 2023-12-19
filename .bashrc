@@ -658,6 +658,7 @@ function flac_to_ogg_subdir_2 {
 
 
 function dl_yt_audio {
+  # yt-dlp -f 'bestaudio' --cookies-from-browser firefox:~/snap/firefox/common/.mozilla/firefox/DIRECTORY -o 'download.%(ext)s' $1
   yt-dlp -f 'bestaudio' -o 'download.%(ext)s' $1
 
   if [ ! -f download.webm ]; then
@@ -672,10 +673,25 @@ function dl_yt_audio {
       return
   fi
 
-  # ffmpeg -i "audio.opus" "audio.flac"
+  ffmpeg -i "audio.opus" "audio.flac"
   rm download.webm
-  # rm audio.opus
+  rm audio.opus
 }
+
+function to_yt_audio {
+  ffmpeg -i "$1" -vn -acodec copy "audio.opus"
+
+  if [ ! -f audio.opus ]; then
+      echo "No audio.opus file"
+      return
+  fi
+
+  ffmpeg -i "audio.opus" "audio.flac"
+  rm download.webm
+  rm audio.opus
+}
+
+
 
 function wtm {
   input=$1
@@ -1251,6 +1267,11 @@ alias dec='gpg --pinentry-mode loopback --decrypt'
 # Locally, --pinentry-mode loopback seems to use cmdline input instead of the
 # UI dialog.
 
+# Install Discord Update
+function idu {
+  cd ~/Downloads
+  sdi $(find -name discord* | head -n 1 | tr -d '\n')
+}
 
 
 
@@ -1491,3 +1512,8 @@ fi
 # export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libgtk3-nocsd.so.0
 
 [ -f "/home/mjw/.ghcup/env" ] && source "/home/mjw/.ghcup/env" # ghcup-env
+
+
+# 2023-10-14 https://asdf-vm.com/guide/getting-started.html
+. "$HOME/.asdf/asdf.sh"
+. "$HOME/.asdf/completions/asdf.bash"
