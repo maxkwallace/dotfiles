@@ -702,13 +702,65 @@ function wtm {
 function compressv {
   input=$1
 
-  ffmpeg -i $1 -vcodec libx265 -crf 24 "${input%.*}-1.mp4"
+  ffmpeg -i $1 -vcodec libx265 -crf 26 "${input%.*}-1.mp4"
   if [ -f "${input%.*}-1.mp4" ]; then
       rm "$1"
   else
       echo "error: no output file"
+      break
   fi
 }
+
+
+
+function wmv_to_mp4 {
+  for input in *.wmv;
+  do
+    ffmpeg -i $input -vcodec libx265 -crf 24 "${input%.*}__1.mp4"
+    if [ -f "${input%.*}__1.mp4" ]; then
+        # rm "$input"
+        echo "would have deleted"
+    else
+        echo "error: no output file"
+        break
+    fi
+  done
+}
+
+function wmv_to_mp4_subdir_1 {
+  for g in *; do
+      if [ -d "$g" ]; then
+        echo $(pwd)/$g
+        cd "$g"
+
+        for input in *.wmv;
+        do
+          pwdvar=$(pwd)
+          tpwdvar=${pwdvar:0:25}
+          if [ $tpwdvar != "/home/mxw/Documents/qccp-" ]; then
+            echo "ERROR"
+            exit 1
+          elif [ -f "$input" ]; then
+            echo $(pwd)/$input
+
+            ffmpeg -i $input -vcodec libx265 -crf 20 -preset slow "${input%.*}__1.mp4"
+            if [ -f "${input%.*}__1.mp4" ]; then
+                # rm "$input"
+                echo "would have deleted"
+                sleep 3
+            else
+                echo "error: no output file"
+                break
+            fi
+          fi
+        done
+
+        cd ..
+        sleep 5
+      fi
+  done
+}
+
 
 function halfframev {
   input=$1
