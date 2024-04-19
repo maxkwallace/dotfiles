@@ -716,8 +716,22 @@ function compressv {
 function wmv_to_mp4 {
   for input in *.wmv;
   do
-    ffmpeg -i $input -vcodec libx265 -crf 24 "${input%.*}__1.mp4"
+    ffmpeg -i $input -vcodec libx265 -crf 21 -preset slow "${input%.*}__1.mp4"
     if [ -f "${input%.*}__1.mp4" ]; then
+        # rm "$input"
+        echo "would have deleted"
+    else
+        echo "error: no output file"
+        break
+    fi
+  done
+}
+
+function rm_to_mp4 {
+  for input in *.rm;
+  do
+    ffmpeg -i $input -vcodec libx265 -crf 21 -preset slow "${input%.*}__6.mp4"
+    if [ -f "${input%.*}__6.mp4" ]; then
         # rm "$input"
         echo "would have deleted"
     else
@@ -743,14 +757,14 @@ function wmv_to_mp4_subdir_1 {
           elif [ -f "$input" ]; then
             echo $(pwd)/$input
 
-            ffmpeg -i $input -vcodec libx265 -crf 20 -preset slow "${input%.*}__1.mp4"
-            if [ -f "${input%.*}__1.mp4" ]; then
+            ffmpeg -i $input -vcodec libx265 -crf 21 -preset slow "${input%.*}__6.mp4"
+            if [ -f "${input%.*}__6.mp4" ]; then
                 # rm "$input"
                 echo "would have deleted"
-                sleep 3
+                sleep 5
             else
                 echo "error: no output file"
-                break
+                exit 1
             fi
           fi
         done
@@ -765,7 +779,7 @@ function wmv_to_mp4_subdir_1 {
 function halfframev {
   input=$1
 
-  ffmpeg -i $1 -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 24 "${input%.*}-1.mp4"
+  ffmpeg -i $1 -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx264 -crf 24 "${input%.*}-1.mp4"
   if [ -f "${input%.*}-1.mp4" ]; then
      rm "$1"
   else
@@ -1321,8 +1335,9 @@ alias dec='gpg --pinentry-mode loopback --decrypt'
 
 # Install Discord Update
 function idu {
-  cd ~/Downloads
-  sdi $(find -name discord* | head -n 1 | tr -d '\n')
+  echo "make it autodelete bitch"
+  # cd ~/Downloads
+  # sdi $(find -name discord* | head -n 1 | tr -d '\n')
 }
 
 
