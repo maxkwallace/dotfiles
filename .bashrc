@@ -8,6 +8,16 @@
 # - Double quotes do the same, except for $, `, \, and !
 # See http://stackoverflow.com/a/6697781/1067145
 
+# filename_extension_test foo/asdf.mp4
+# >> qqmp4
+# >> qqfoo/asdf
+function filename_extension_test {
+  extension="qq${1##*.}"
+  filename="qq${1%.*}"
+  echo $extension
+  echo $filename
+}
+
 # Test if a variable is unset or a length-zero string:
 # if [ -z "$bar" ]
 # then
@@ -794,6 +804,14 @@ function mtm {
   ffmpeg -i $1 -movflags faststart -profile:v high -level 4.2 "${input%.*}-2.mp4"
 }
 
+# slice_video asdf.mp4 00:02:41.000 45
+# https://superuser.com/questions/377343/cut-part-from-video-file-from-start-position-to-end-position-with-ffmpeg
+function slice_video {
+  filename=$1
+  start=$2
+  duration=$3
+  ffmpeg -ss $start -i $filename -t $duration -map 0 -c copy "${filename%.*}-excerpt.${filename##*.}"
+}
 
 
 
