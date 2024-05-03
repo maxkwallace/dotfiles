@@ -1353,9 +1353,9 @@ alias dec='gpg --pinentry-mode loopback --decrypt'
 
 # Install Discord Update
 function idu {
-  echo "make it autodelete bitch"
-  # cd ~/Downloads
-  # sdi $(find -name discord* | head -n 1 | tr -d '\n')
+  cd ~/Downloads
+  sdi $(find -name discord* | head -n 1 | tr -d '\n')
+  rm $(find -name discord* | head -n 1 | tr -d '\n')
 }
 
 
